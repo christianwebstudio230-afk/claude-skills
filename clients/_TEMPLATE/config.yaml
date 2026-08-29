@@ -1,0 +1,37 @@
+# Configuration client AKOMA DIGITAL LTD
+# Copier ce template dans clients/[NOM_CLIENT]/config.yaml
+
+client: "[NOM_CLIENT]"
+secteur: "[Secteur d'activité]"
+contact:
+  nom: "[Prénom Nom]"
+  email: "[email@domaine.com]"
+  telephone: "[+XX XX XX XX XX]"
+  role: "[Fonction]"
+
+# Applicable si niche conciergerie ou commission
+taux_commission: null  # ex: 0.10 pour 10% — null si non applicable
+
+monnaie: "EUR"  # EUR, GBP, USD, XOF, MAD...
+fuseau_horaire: "Europe/Paris"  # ex: Africa/Abidjan, Europe/London
+
+# Niche AKOMA principale
+# Valeurs: conciergerie, restauration, pme, profession-liberale, commerce, association, immobilier
+niche_akoma: "[niche]"
+
+# Règles métier spécifiques au client
+# Ajouter ici les règles de calcul, seuils, ou logique propre au client
+regles_metier: {}
+  # exemple:
+  # frais_menage_fixe: 50.0
+  # nuits_minimum: 2
+  # taxe_sejour_par_nuit: 2.5
+
+# Chemins relatifs à la racine du projet
+chemins:
+  sorties: "clients/[NOM_CLIENT]/livrables/"
+  donnees: "clients/[NOM_CLIENT]/donnees/"
+
+# Metadata
+date_creation: "[YYYY-MM-DD]"
+statut: "actif"  # prospect, actif, en_pause, termine
