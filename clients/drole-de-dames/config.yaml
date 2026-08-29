@@ -1,0 +1,31 @@
+# Configuration client AKOMA DIGITAL LTD
+# Copier ce template dans clients/[NOM_CLIENT]/config.yaml
+
+client: "drole-de-dames"
+secteur: "[Secteur d'activité]"
+contact:
+  nom: "[Prénom Nom]"
+  email: "[email@domaine.com]"
+  telephone: "[+XX XX XX XX XX]"
+  role: "[Fonction]"
+
+# Applicable si niche conciergerie ou commission
+taux_commission: null  # ex: 0.10 pour 10% — null si non applicable
+
+monnaie: "EUR"  # EUR, GBP, USD, XOF, MAD...
+fuseau_horaire: "Europe/Paris"  # ex: Africa/Abidjan, Europe/London
+
+# Niche AKOMA principale
+niche_akoma: "[niche]"
+
+# Règles métier spécifiques au client
+regles_metier: {}
+
+# Chemins relatifs à la racine du projet
+chemins:
+  sorties: "clients/drole-de-dames/livrables/"
+  donnees: "clients/drole-de-dames/donnees/"
+
+# Metadata
+date_creation: "2026-08-29"
+statut: "actif"
