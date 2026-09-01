@@ -32,6 +32,18 @@ chemins:
   sorties: "clients/[NOM_CLIENT]/livrables/"
   donnees: "clients/[NOM_CLIENT]/donnees/"
 
+# Réglages du module montage vidéo (scripts/montage_video_core.py)
+# Applicable uniquement si le client a un besoin de montage vidéo
+montage_video:
+  gemini_modele: "gemini-2.5-pro"
+  marge_coupe_secondes: 0.15        # marge retirée de chaque bord d'un bafouillage supprimé
+  duree_min_bafouillage: 0.3        # ignorer les hésitations plus courtes (naturel à l'oral)
+  resolution_sortie: [1920, 1080]
+  mots_cles_broll: []               # mots déclenchant un point d'insertion b-roll suggéré
+    # exemple:
+    # - "résultat"
+    # - "chiffres"
+
 # Metadata
 date_creation: "[YYYY-MM-DD]"
 statut: "actif"  # prospect, actif, en_pause, termine

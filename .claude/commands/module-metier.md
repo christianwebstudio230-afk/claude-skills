@@ -16,6 +16,7 @@ Lance le sous-agent spécialisé correspondant au module métier demandé.
 |--------|-----------|-------------------|
 | `conciergerie` | `reporting-conciergerie` | client, mois, taux_commission, fichier_donnees |
 | `audit-process` | `architecte-process` | client, chemin_fichiers, periode |
+| `montage-video` | `montage-video` | client, chemin_video, dossier_sortie, rendre (optionnel) |
 
 ## Étapes à exécuter
 
@@ -32,6 +33,10 @@ Lance le sous-agent spécialisé correspondant au module métier demandé.
    Pour `audit-process` :
    - Déléguer au sous-agent `architecte-process` avec :
      - client, chemin_fichiers, periode, focus (optionnel)
+
+   Pour `montage-video` :
+   - Déléguer au sous-agent `montage-video` avec :
+     - client, chemin_video, dossier_sortie, rendre (optionnel — false par défaut)
 
 4. **Relayer le résultat** du sous-agent tel quel, en ajoutant uniquement le bloc de statut final si absent.
 
