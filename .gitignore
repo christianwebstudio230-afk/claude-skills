@@ -8,3 +8,11 @@ clients/*/donnees/
 clients/*/livrables/**/*.mp4
 clients/*/livrables/**/*.mov
 clients/*/livrables/**/*.mkv
+
+# Frames de vérification (échantillons du visage du client) et projets de
+# travail HyperFrames (matting : des centaines d'images de la personne,
+# audio extrait, cache whisperx) — jamais dans le dépôt, données personnelles
+# identifiables + volume. Régénérables depuis coupe.mp4 + prepare.sh.
+clients/*/livrables/**/_probe/
+clients/*/livrables/**/hf-captions/
+clients/*/livrables/**/*.log

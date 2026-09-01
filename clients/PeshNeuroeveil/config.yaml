@@ -39,10 +39,14 @@ montage_video:
   marge_coupe_secondes: 0.15        # marge retirée de chaque bord d'un bafouillage supprimé
   duree_min_bafouillage: 0.3        # ignorer les hésitations plus courtes (naturel à l'oral)
   resolution_sortie: [1920, 1080]
-  mots_cles_broll: []               # mots déclenchant un point d'insertion b-roll suggéré
-    # exemple:
-    # - "résultat"
-    # - "chiffres"
+  mots_cles_broll:                  # dérivés du transcript.json réel (témoignage parent, 2026-09-01)
+    - "association"
+    - "locaux"
+    - "matériel"
+    - "enfants"
+    - "intervenants"
+
+  style_sous_titres: "verbatim_discret"  # rail anchor discret (embedded-captions) — pas d'embed cinématique
 
   # Secours automatique et gratuit si Gemini est indisponible (clé absente, quota, réseau) :
   # transcription locale via faster-whisper (pip install faster-whisper), aucun abonnement.

@@ -71,5 +71,61 @@
       "texte": "Merci beaucoup à la belle."
     }
   ],
-  "points_broll_suggeres": []
+  "points_broll_suggeres": [
+    {
+      "debut": 0.0,
+      "mot_cle": "association",
+      "contexte": "Aujourd'hui, pour pouvoir finaliser l'inscription de votre fils avec l'association Pêche-Nauré-Eveille,"
+    },
+    {
+      "debut": 18.04,
+      "mot_cle": "association",
+      "contexte": "Alors j'ai souhaité inscrire Maximilien à l'association car je fais suivre Maximilien par Françoise depuis plusieurs années maintenant."
+    },
+    {
+      "debut": 28.78,
+      "mot_cle": "association",
+      "contexte": "Donc elle m'a présenté cette association et je trouve que le fait d'avoir tous les prestataires, tous les intervenants au même endroit,"
+    },
+    {
+      "debut": 28.78,
+      "mot_cle": "intervenants",
+      "contexte": "Donc elle m'a présenté cette association et je trouve que le fait d'avoir tous les prestataires, tous les intervenants au même endroit,"
+    },
+    {
+      "debut": 45.84,
+      "mot_cle": "association",
+      "contexte": "de couper les journées d'école ou autre. De plus, l'association présente des locaux qui sont très bien adaptés avec du matériel."
+    },
+    {
+      "debut": 45.84,
+      "mot_cle": "locaux",
+      "contexte": "de couper les journées d'école ou autre. De plus, l'association présente des locaux qui sont très bien adaptés avec du matériel."
+    },
+    {
+      "debut": 45.84,
+      "mot_cle": "matériel",
+      "contexte": "de couper les journées d'école ou autre. De plus, l'association présente des locaux qui sont très bien adaptés avec du matériel."
+    },
+    {
+      "debut": 63.7,
+      "mot_cle": "enfants",
+      "contexte": "Des choses qui sont proposées pour les enfants, mais aussi pour les parents, pour les accompagnés, pour les aider."
+    },
+    {
+      "debut": 68.92,
+      "mot_cle": "association",
+      "contexte": "Et ça on ne le trouve pas partout. Donc moi j'ai plein de confiance en l'association."
+    },
+    {
+      "debut": 91.74,
+      "mot_cle": "enfants",
+      "contexte": "Et puis aussi on va parler avec un tarif qui est abordable pour les familles et avec de la bienveillance envers les enfants."
+    },
+    {
+      "debut": 104.4,
+      "mot_cle": "association",
+      "contexte": "Moi j'admire ça. Donc c'est pour ça que je passe à l'association."
+    }
+  ]
 }
