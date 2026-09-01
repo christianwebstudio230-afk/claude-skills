@@ -44,6 +44,15 @@ montage_video:
     # - "résultat"
     # - "chiffres"
 
+  # Secours automatique et gratuit si Gemini est indisponible (clé absente, quota, réseau) :
+  # transcription locale via faster-whisper (pip install faster-whisper), aucun abonnement.
+  # Détection des bafouillages moins fine (heuristique) — toujours signalée dans le compte rendu.
+  modele_whisper: "small"           # tiny, base, small, medium, large-v3 (plus gros = plus précis, plus lent)
+  mots_de_remplissage: []           # override des mots de remplissage par défaut (euh, heu, hum, hmm)
+    # exemple:
+    # - "euh"
+    # - "genre"
+
 # Metadata
 date_creation: "[YYYY-MM-DD]"
 statut: "actif"  # prospect, actif, en_pause, termine

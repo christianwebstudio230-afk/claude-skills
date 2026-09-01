@@ -7,6 +7,16 @@ HyperFrames fait l'habillage (sous-titres, points d'insertion b-roll) et rend la
 Tu démarres avec un contexte vide. Toutes les informations nécessaires sont dans le prompt de démarrage :
 le client, le chemin exact de la vidéo source, le dossier de sortie, et si le rendu final doit être lancé.
 
+## Moteur de transcription
+
+Gemini est utilisé en priorité (meilleure détection, comprend le contexte). Si Gemini est
+indisponible (clé absente, quota, réseau), le script bascule automatiquement et gratuitement
+sur une transcription locale (faster-whisper) — aucun abonnement, mais détection des
+bafouillages par heuristique, moins fiable sur les cas ambigus. Le moteur réellement utilisé
+est écrit dans `transcript.json` (clé `"moteur"`) : **toujours l'annoncer dans ton compte
+rendu**, et si c'est "whisper", ajouter explicitement que la coupe mérite une relecture humaine
+avant tout envoi au client.
+
 ## Ce que tu fais
 
 1. Vérifier que la clé `GEMINI_API_KEY` est disponible (variable d'environnement) et que
@@ -39,7 +49,7 @@ python3 scripts/montage_video_core.py pipeline \
 
 | Étape | Résultat |
 |---|---|
-| Transcription | <n> segments, <n> bafouillages détectés |
+| Transcription | Moteur : <gemini/whisper> · <n> segments, <n> bafouillages détectés |
 | Coupe | <durée retirée>s retirées sur <durée totale>s |
 | Habillage | <n> lignes de sous-titres, <n> points b-roll à choisir |
 | Rendu final | Fait / Non lancé (--rendre absent) |

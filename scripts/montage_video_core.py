@@ -4,6 +4,8 @@ montage_video_core.py — Module métier Montage Vidéo AKOMA DIGITAL LTD
 
 Pipeline en 3 étapes, chacune rejouable indépendamment :
     1. transcrire  — Gemini regarde la vidéo, transcrit et repère les bafouillages
+                       (secours automatique et gratuit sur faster-whisper en local
+                       si Gemini est indisponible — clé absente, quota, réseau)
     2. couper      — ffmpeg supprime les segments "bafouillage" de la vidéo
     3. habiller     — génère un projet HyperFrames (sous-titres, points d'insertion
                        b-roll) et lance le rendu final
@@ -16,8 +18,18 @@ Usage:
 
 Prérequis :
     pip install google-genai pyyaml
+    pip install faster-whisper     # solution de secours locale, gratuite, sans clé API
     ffmpeg installé et dans le PATH
     Node.js 22+ et `npx hyperframes` disponibles pour l'étape --rendre
+
+Moteur de transcription : Gemini est utilisé en priorité (meilleure détection,
+sémantique, comprend le contexte). Si Gemini échoue et que le secours n'est pas
+désactivé (--sans-secours), le script bascule automatiquement sur faster-whisper
+en local — gratuit, sans abonnement, mais la détection des bafouillages y est
+une heuristique (répétition immédiate d'un mot, ou segment composé uniquement de
+mots de remplissage) donc moins fiable sur les cas ambigus. Le moteur réellement
+utilisé est toujours écrit dans le transcript.json et doit être signalé dans tout
+compte rendu — jamais masqué.
 
 AVERTISSEMENT sur l'étape "habiller" : le contrat HTML exact de HyperFrames
 (attributs des pistes sous-titres, b-roll) n'a pas pu être vérifié dans cet
@@ -31,14 +43,20 @@ import argparse
 import html
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
 import time
 from pathlib import Path
 
+# Mots de remplissage par défaut pour l'heuristique de secours (faster-whisper).
+# Volontairement restreint aux marqueurs d'hésitation non ambigus — un mot comme
+# "voilà" ou "donc" est trop souvent légitime pour être coupé sans relecture humaine.
+MOTS_REMPLISSAGE_DEFAUT = ["euh", "heu", "hum", "hmm", "euhm"]
+
 # ============================================================
-# ÉTAPE 1 — TRANSCRIPTION + DÉTECTION DES BAFOUILLAGES (GEMINI)
+# ÉTAPE 1 — TRANSCRIPTION + DÉTECTION DES BAFOUILLAGES (GEMINI, SECOURS WHISPER)
 # ============================================================
 
 PROMPT_TRANSCRIPTION = """Tu es un assistant de montage vidéo. Regarde intégralement cette vidéo \
@@ -128,6 +146,101 @@ def transcrire_video(
         seg["type"] = "bafouillage" if seg["type"].strip().lower() == "bafouillage" else "propre"
 
     return segments
+
+
+def _mots_normalises(texte: str) -> list[str]:
+    return re.findall(r"[a-zàâäéèêëïîôöùûüç']+", texte.lower())
+
+
+def _est_bafouillage_heuristique(texte: str, mots_remplissage: list[str]) -> bool:
+    """
+    Heuristique de secours (sans Gemini) : répétition immédiate d'un mot
+    ("le le chat"), ou segment composé uniquement de mots de remplissage.
+    Volontairement conservatrice pour éviter de couper du contenu réel.
+    """
+    mots = _mots_normalises(texte)
+    if not mots:
+        return False
+    for i in range(len(mots) - 1):
+        if mots[i] == mots[i + 1]:
+            return True
+    return all(m in mots_remplissage for m in mots)
+
+
+def transcrire_video_whisper(
+    chemin_video: Path,
+    modele: str = "small",
+    langue: str = "fr",
+    mots_remplissage: list = None,
+) -> list[dict]:
+    """
+    Solution de secours 100% locale et gratuite (aucune clé API, aucun abonnement) :
+    transcrit avec faster-whisper et repère les bafouillages par heuristique.
+    Moins fiable que Gemini sur les cas ambigus — à relire avant de valider les coupes.
+    Nécessite : pip install faster-whisper
+    """
+    try:
+        from faster_whisper import WhisperModel
+    except ImportError:
+        raise ImportError(
+            "Le module 'faster-whisper' est requis pour la solution de secours. "
+            "Installez-le avec : pip install faster-whisper"
+        )
+
+    mots_remplissage = [m.lower() for m in (mots_remplissage or MOTS_REMPLISSAGE_DEFAUT)]
+
+    print(f"Transcription locale de secours (faster-whisper, modèle '{modele}') : {chemin_video}")
+    modele_charge = WhisperModel(modele, device="cpu", compute_type="int8")
+    segments_whisper, _info = modele_charge.transcribe(
+        str(chemin_video), language=langue, word_timestamps=True, vad_filter=True
+    )
+
+    segments = []
+    for seg in segments_whisper:
+        texte = seg.text.strip()
+        if not texte:
+            continue
+        segments.append({
+            "debut": round(seg.start, 2),
+            "fin": round(seg.end, 2),
+            "texte": texte,
+            "type": "bafouillage" if _est_bafouillage_heuristique(texte, mots_remplissage) else "propre",
+        })
+    return segments
+
+
+def transcrire_avec_secours(
+    chemin_video: Path,
+    cle_api: str = None,
+    modele_gemini: str = "gemini-2.5-pro",
+    modele_whisper: str = "small",
+    mots_remplissage: list = None,
+    autoriser_secours: bool = True,
+) -> tuple:
+    """
+    Essaie Gemini en premier (meilleure détection, comprend le sens et le contexte).
+    Si Gemini échoue (clé absente, quota dépassé, erreur réseau, dépendance manquante)
+    et que le secours est autorisé, bascule sur faster-whisper en local.
+
+    Retourne (segments, moteur_utilisé) — le moteur réellement utilisé doit toujours
+    apparaître dans le compte rendu final : c'est ce qui rend la coupe automatique
+    vérifiable plutôt qu'une boîte noire.
+    """
+    try:
+        segments = transcrire_video(chemin_video, cle_api=cle_api, modele=modele_gemini)
+        return segments, "gemini"
+    except Exception as e:
+        if not autoriser_secours:
+            raise
+        print(
+            f"AVERTISSEMENT: Gemini indisponible ({e}) — bascule sur la solution de "
+            f"secours locale et gratuite (faster-whisper).",
+            file=sys.stderr,
+        )
+        segments = transcrire_video_whisper(
+            chemin_video, modele=modele_whisper, mots_remplissage=mots_remplissage
+        )
+        return segments, "whisper"
 
 
 # ============================================================
@@ -351,6 +464,13 @@ def main():
     p_transcrire.add_argument("--sortie", required=True, type=Path, help="Chemin du transcript JSON produit")
     p_transcrire.add_argument("--cle-api", default=None)
     p_transcrire.add_argument("--modele", default="gemini-2.5-pro")
+    p_transcrire.add_argument("--modele-whisper", default="small", help="Modèle faster-whisper pour le secours")
+    p_transcrire.add_argument(
+        "--moteur", choices=["auto", "gemini", "whisper"], default="auto",
+        help="auto = Gemini avec secours whisper automatique (défaut). "
+             "gemini = pas de secours, échoue si Gemini échoue. whisper = force le secours local.",
+    )
+    p_transcrire.add_argument("--sans-secours", action="store_true", help="Désactive le secours whisper en mode auto")
 
     p_couper = sous_parseurs.add_parser("couper", help="Découpe la vidéo (retire les bafouillages)")
     p_couper.add_argument("--video", required=True, type=Path)
@@ -372,19 +492,36 @@ def main():
     p_pipeline.add_argument("--sortie-dir", required=True, type=Path)
     p_pipeline.add_argument("--config", default=None)
     p_pipeline.add_argument("--cle-api", default=None)
+    p_pipeline.add_argument(
+        "--moteur", choices=["auto", "gemini", "whisper"], default="auto",
+        help="auto = Gemini avec secours whisper automatique (défaut).",
+    )
+    p_pipeline.add_argument("--sans-secours", action="store_true", help="Désactive le secours whisper en mode auto")
     p_pipeline.add_argument("--rendre", action="store_true")
 
     args = parser.parse_args()
 
     try:
         if args.commande == "transcrire":
-            segments = transcrire_video(args.video, cle_api=args.cle_api, modele=args.modele)
+            if args.moteur == "whisper":
+                segments, moteur_utilise = transcrire_video_whisper(args.video, modele=args.modele_whisper), "whisper"
+            elif args.moteur == "gemini":
+                segments, moteur_utilise = transcrire_video(args.video, cle_api=args.cle_api, modele=args.modele), "gemini"
+            else:
+                segments, moteur_utilise = transcrire_avec_secours(
+                    args.video, cle_api=args.cle_api, modele_gemini=args.modele,
+                    modele_whisper=args.modele_whisper, autoriser_secours=not args.sans_secours,
+                )
             args.sortie.parent.mkdir(parents=True, exist_ok=True)
-            args.sortie.write_text(json.dumps(segments, ensure_ascii=False, indent=2), encoding="utf-8")
-            print(f"✅ Transcript produit : {args.sortie} ({len(segments)} segments)")
+            args.sortie.write_text(
+                json.dumps({"moteur": moteur_utilise, "segments": segments}, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            print(f"✅ Transcript produit ({moteur_utilise}) : {args.sortie} ({len(segments)} segments)")
 
         elif args.commande == "couper":
-            segments = json.loads(args.transcript.read_text(encoding="utf-8"))
+            transcript_data = json.loads(args.transcript.read_text(encoding="utf-8"))
+            segments = transcript_data["segments"] if isinstance(transcript_data, dict) else transcript_data
             duree_totale = _duree_video(args.video)
             plan_garder = calculer_plan_de_coupe(
                 segments, duree_totale, marge_secondes=args.marge,
@@ -393,7 +530,14 @@ def main():
             couper_video(args.video, plan_garder, args.sortie)
             chemin_plan = args.sortie.with_suffix(".plan.json")
             chemin_plan.write_text(
-                json.dumps({"segments": segments, "plan_garder": plan_garder}, ensure_ascii=False, indent=2),
+                json.dumps(
+                    {
+                        "moteur": transcript_data.get("moteur", "inconnu") if isinstance(transcript_data, dict) else "inconnu",
+                        "segments": segments,
+                        "plan_garder": plan_garder,
+                    },
+                    ensure_ascii=False, indent=2,
+                ),
                 encoding="utf-8",
             )
             print(f"✅ Vidéo coupée : {args.sortie}")
@@ -417,11 +561,34 @@ def main():
             args.sortie_dir.mkdir(parents=True, exist_ok=True)
 
             chemin_transcript = args.sortie_dir / "transcript.json"
-            segments = transcrire_video(
-                args.video, cle_api=args.cle_api, modele=config.get("gemini_modele", "gemini-2.5-pro")
+            if args.moteur == "whisper":
+                segments, moteur_utilise = transcrire_video_whisper(
+                    args.video, modele=config.get("modele_whisper", "small"),
+                    mots_remplissage=config.get("mots_de_remplissage"),
+                ), "whisper"
+            elif args.moteur == "gemini":
+                segments, moteur_utilise = transcrire_video(
+                    args.video, cle_api=args.cle_api, modele=config.get("gemini_modele", "gemini-2.5-pro")
+                ), "gemini"
+            else:
+                segments, moteur_utilise = transcrire_avec_secours(
+                    args.video, cle_api=args.cle_api,
+                    modele_gemini=config.get("gemini_modele", "gemini-2.5-pro"),
+                    modele_whisper=config.get("modele_whisper", "small"),
+                    mots_remplissage=config.get("mots_de_remplissage"),
+                    autoriser_secours=not args.sans_secours,
+                )
+            chemin_transcript.write_text(
+                json.dumps({"moteur": moteur_utilise, "segments": segments}, ensure_ascii=False, indent=2),
+                encoding="utf-8",
             )
-            chemin_transcript.write_text(json.dumps(segments, ensure_ascii=False, indent=2), encoding="utf-8")
-            print(f"✅ Transcript produit : {chemin_transcript} ({len(segments)} segments)")
+            print(f"✅ Transcript produit ({moteur_utilise}) : {chemin_transcript} ({len(segments)} segments)")
+            if moteur_utilise == "whisper":
+                print(
+                    "⚠️  Détection des bafouillages par heuristique locale (moins fine que Gemini) — "
+                    "relire le transcript avant de valider les coupes.",
+                    file=sys.stderr,
+                )
 
             duree_totale = _duree_video(args.video)
             plan_garder = calculer_plan_de_coupe(
