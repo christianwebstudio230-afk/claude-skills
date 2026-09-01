@@ -2,25 +2,26 @@
 """
 montage_video_core.py — Module métier Montage Vidéo AKOMA DIGITAL LTD
 
-Pipeline en 3 étapes, chacune rejouable indépendamment :
+Pipeline en 3 étapes :
     1. transcrire  — Gemini regarde la vidéo, transcrit et repère les bafouillages
                        (secours automatique et gratuit sur faster-whisper en local
                        si Gemini est indisponible — clé absente, quota, réseau)
     2. couper      — ffmpeg supprime les segments "bafouillage" de la vidéo
-    3. habiller     — génère un projet HyperFrames (sous-titres, points d'insertion
-                       b-roll) et lance le rendu final
+    3. habiller     — CE SCRIPT NE GÉNÈRE PAS LE HTML HYPERFRAMES. Il exporte les
+                       sous-titres reprojetés sur la timeline coupée (JSON), prêts
+                       à être injectés dans une composition authored par un agent
+                       équipé des skills HyperFrames officielles (voir plus bas).
 
 Usage:
     python3 montage_video_core.py transcrire --video source.mp4 --sortie transcript.json
     python3 montage_video_core.py couper --video source.mp4 --transcript transcript.json --sortie coupe.mp4
-    python3 montage_video_core.py habiller --video-coupee coupe.mp4 --plan coupe.plan.json --sortie projet.html --rendre
+    python3 montage_video_core.py habiller --plan coupe.plan.json --sortie sous_titres.json
     python3 montage_video_core.py pipeline --video source.mp4 --sortie-dir sorties/<client>/
 
 Prérequis :
     pip install google-genai pyyaml
     pip install faster-whisper     # solution de secours locale, gratuite, sans clé API
     ffmpeg installé et dans le PATH
-    Node.js 22+ et `npx hyperframes` disponibles pour l'étape --rendre
 
 Moteur de transcription : Gemini est utilisé en priorité (meilleure détection,
 sémantique, comprend le contexte). Si Gemini échoue et que le secours n'est pas
@@ -31,16 +32,19 @@ mots de remplissage) donc moins fiable sur les cas ambigus. Le moteur réellemen
 utilisé est toujours écrit dans le transcript.json et doit être signalé dans tout
 compte rendu — jamais masqué.
 
-AVERTISSEMENT sur l'étape "habiller" : le contrat HTML exact de HyperFrames
-(attributs des pistes sous-titres, b-roll) n'a pas pu être vérifié dans cet
-environnement (installation de la skill bloquée par les permissions réseau/exécution).
-Le format généré suit la documentation publique connue (stage / video.clip /
-data-track-index) ; à valider avec `npx hyperframes preview` avant tout rendu final,
-et à ajuster si le format réel diffère.
+SUR L'HABILLAGE : une première version de ce script générait un fichier HTML
+HyperFrames "deviné" (contrat non vérifié). Depuis l'installation réelle de la
+skill (`npx skills add heygen-com/hyperframes --full-depth`), on sait que ce
+pari était faux sur plusieurs points (timeline GSAP obligatoire enregistrée sur
+window.__timelines, data-duration racine, etc.) : générer du HTML à l'aveugle
+depuis Python serait justement le genre de chiffre/contrat inventé que la
+constitution AKOMA interdit. L'habillage (sous-titres, b-roll, zooms, plans de
+coupe) est donc délégué à un agent qui charge /hyperframes → /hyperframes-core
+(+ /media-use, /hyperframes-keyframes selon besoin) et authore la composition
+avec le vrai contrat, validée par `npx hyperframes check` avant tout rendu.
 """
 
 import argparse
-import html
 import json
 import os
 import re
@@ -371,73 +375,40 @@ def construire_sous_titres(segments: list[dict], plan_garder: list[tuple]) -> li
     return sous_titres
 
 
-def generer_projet_hyperframes(
-    chemin_video_coupee: Path,
+def detecter_points_broll(sous_titres: list[dict], mots_cles_broll: list = None) -> list[dict]:
+    """
+    Repère les sous-titres contenant un mot-clé b-roll configuré. Ne choisit jamais
+    l'asset : c'est un point de départ pour l'agent/l'éditeur humain, pas une décision
+    créative que ce script peut prendre à leur place.
+    """
+    mots_cles_broll = mots_cles_broll or []
+    points = []
+    for st in sous_titres:
+        for mot in mots_cles_broll:
+            if mot.lower() in st["texte"].lower():
+                points.append({"debut": st["debut"], "mot_cle": mot, "contexte": st["texte"]})
+    return points
+
+
+def exporter_sous_titres(
     sous_titres: list[dict],
-    chemin_sortie_html: Path,
-    resolution: tuple = (1920, 1080),
+    chemin_sortie_json: Path,
     mots_cles_broll: list = None,
 ) -> Path:
     """
-    Génère un fichier HTML HyperFrames : la vidéo coupée sur une piste, les
-    sous-titres sur une piste dédiée, et des marqueurs d'insertion b-roll aux
-    endroits où un mot-clé métier apparaît (l'asset reste à choisir par l'éditeur —
-    ce n'est pas une décision que ce script peut prendre à la place d'un humain).
+    Exporte les sous-titres (déjà reprojetés sur la timeline coupée) et les points
+    d'insertion b-roll suggérés, en JSON — pas en HTML HyperFrames. La composition
+    elle-même doit être authored par un agent chargeant /hyperframes (contrat réel :
+    timeline GSAP enregistrée, data-duration racine, etc. — voir SKILL.md), jamais
+    générée à l'aveugle par ce script.
     """
-    largeur, hauteur = resolution
-    duree_totale = sous_titres[-1]["fin"] if sous_titres else 0
-    mots_cles_broll = mots_cles_broll or []
-
-    lignes = [
-        "<!DOCTYPE html>",
-        "<html><head><meta charset='utf-8'><title>Montage</title></head><body>",
-        f'<div id="stage" data-composition-id="montage" data-start="0" '
-        f'data-width="{largeur}" data-height="{hauteur}">',
-        f'  <video class="clip" data-start="0" data-duration="{duree_totale}" '
-        f'data-track-index="0" src="{chemin_video_coupee}" muted playsinline></video>',
-        "  <!-- Sous-titres : format à valider avec `npx hyperframes preview` "
-        "(contrat exact de la piste caption non confirmé dans cet environnement) -->",
-    ]
-
-    for st in sous_titres:
-        duree = round(st["fin"] - st["debut"], 2)
-        texte = html.escape(st["texte"])
-        lignes.append(
-            f'  <div class="caption" data-start="{st["debut"]}" '
-            f'data-duration="{duree}" data-track-index="1">{texte}</div>'
-        )
-
-    if mots_cles_broll:
-        lignes.append("  <!-- Points d'insertion b-roll suggérés — asset à choisir par l'éditeur -->")
-        for st in sous_titres:
-            for mot in mots_cles_broll:
-                if mot.lower() in st["texte"].lower():
-                    lignes.append(
-                        f'  <!-- TODO b-roll "{mot}" à {st["debut"]}s : '
-                        f'<video class="clip" data-track-index="2" data-start="{st["debut"]}" '
-                        f'data-duration="..." src="broll_A_CHOISIR.mp4"> -->'
-                    )
-
-    lignes += ["</div>", "</body></html>"]
-
-    chemin_sortie_html.parent.mkdir(parents=True, exist_ok=True)
-    chemin_sortie_html.write_text("\n".join(lignes), encoding="utf-8")
-    return chemin_sortie_html
-
-
-def rendre_hyperframes(chemin_html: Path, chemin_sortie_mp4: Path) -> Path:
-    """Lance `npx hyperframes render`. Nécessite Node.js et un accès réseau/exécution npx."""
-    if not shutil.which("npx"):
-        raise EnvironmentError("npx introuvable. Installez Node.js 22+.")
-    commande = ["npx", "hyperframes", "render", str(chemin_html), "--out", str(chemin_sortie_mp4)]
-    print(f"Rendu HyperFrames : {' '.join(commande)}")
-    resultat = subprocess.run(commande, capture_output=True, text=True)
-    if resultat.returncode != 0:
-        raise RuntimeError(
-            f"Échec du rendu HyperFrames (commande à vérifier si les options ont changé) :\n"
-            f"{resultat.stderr[-2000:]}"
-        )
-    return chemin_sortie_mp4
+    donnees = {
+        "sous_titres": sous_titres,
+        "points_broll_suggeres": detecter_points_broll(sous_titres, mots_cles_broll),
+    }
+    chemin_sortie_json.parent.mkdir(parents=True, exist_ok=True)
+    chemin_sortie_json.write_text(json.dumps(donnees, ensure_ascii=False, indent=2), encoding="utf-8")
+    return chemin_sortie_json
 
 
 # ============================================================
@@ -479,13 +450,12 @@ def main():
     p_couper.add_argument("--marge", type=float, default=0.15)
     p_couper.add_argument("--duree-min-bafouillage", type=float, default=0.3)
 
-    p_habiller = sous_parseurs.add_parser("habiller", help="Génère le projet HyperFrames et rend la vidéo finale")
-    p_habiller.add_argument("--video-coupee", required=True, type=Path)
+    p_habiller = sous_parseurs.add_parser(
+        "habiller", help="Exporte les sous-titres + points b-roll (JSON) pour l'agent HyperFrames"
+    )
     p_habiller.add_argument("--plan", required=True, type=Path, help="Fichier .plan.json produit par 'couper'")
-    p_habiller.add_argument("--sortie", required=True, type=Path, help="Chemin du .html HyperFrames à générer")
+    p_habiller.add_argument("--sortie", required=True, type=Path, help="Chemin du .json de sous-titres à générer")
     p_habiller.add_argument("--config", default=None, help="clients/<client>/config.yaml")
-    p_habiller.add_argument("--rendre", action="store_true", help="Lance aussi npx hyperframes render")
-    p_habiller.add_argument("--sortie-mp4", type=Path, default=None)
 
     p_pipeline = sous_parseurs.add_parser("pipeline", help="Enchaîne les 3 étapes")
     p_pipeline.add_argument("--video", required=True, type=Path)
@@ -497,7 +467,6 @@ def main():
         help="auto = Gemini avec secours whisper automatique (défaut).",
     )
     p_pipeline.add_argument("--sans-secours", action="store_true", help="Désactive le secours whisper en mode auto")
-    p_pipeline.add_argument("--rendre", action="store_true")
 
     args = parser.parse_args()
 
@@ -547,14 +516,10 @@ def main():
             plan_data = json.loads(args.plan.read_text(encoding="utf-8"))
             sous_titres = construire_sous_titres(plan_data["segments"], plan_data["plan_garder"])
             config = _charger_config_yaml(args.config)
-            resolution = tuple(config.get("resolution_sortie", [1920, 1080]))
             mots_cles = config.get("mots_cles_broll", [])
-            generer_projet_hyperframes(args.video_coupee, sous_titres, args.sortie, resolution, mots_cles)
-            print(f"✅ Projet HyperFrames généré : {args.sortie}")
-            if args.rendre:
-                sortie_mp4 = args.sortie_mp4 or args.sortie.with_suffix(".mp4")
-                rendre_hyperframes(args.sortie, sortie_mp4)
-                print(f"✅ Vidéo finale rendue : {sortie_mp4}")
+            exporter_sous_titres(sous_titres, args.sortie, mots_cles)
+            print(f"✅ Sous-titres + points b-roll exportés : {args.sortie}")
+            print("⏭️  Composition HyperFrames à authorer via l'agent (skill /hyperframes), pas par ce script.")
 
         elif args.commande == "pipeline":
             config = _charger_config_yaml(args.config)
@@ -601,18 +566,15 @@ def main():
             print(f"✅ Vidéo coupée : {chemin_coupe}")
 
             sous_titres = construire_sous_titres(segments, plan_garder)
-            chemin_html = args.sortie_dir / "projet.html"
-            resolution = tuple(config.get("resolution_sortie", [1920, 1080]))
-            generer_projet_hyperframes(chemin_coupe, sous_titres, chemin_html, resolution, config.get("mots_cles_broll", []))
-            print(f"✅ Projet HyperFrames généré : {chemin_html}")
-
-            if args.rendre:
-                chemin_finale = args.sortie_dir / "finale.mp4"
-                rendre_hyperframes(chemin_html, chemin_finale)
-                print(f"✅ Vidéo finale rendue : {chemin_finale}")
-            else:
-                print("⏭️  Rendu non lancé (--rendre absent). Vérifiez le HTML puis lancez :")
-                print(f"    npx hyperframes preview {chemin_html}")
+            chemin_sous_titres = args.sortie_dir / "sous_titres.json"
+            exporter_sous_titres(sous_titres, chemin_sous_titres, config.get("mots_cles_broll", []))
+            print(f"✅ Sous-titres + points b-roll exportés : {chemin_sous_titres}")
+            print(
+                "⏭️  Habillage HyperFrames (sous-titres, b-roll, zooms, plans de coupe) à authorer "
+                "par un agent chargeant la skill /hyperframes sur la vidéo coupée "
+                f"({chemin_coupe}) et {chemin_sous_titres}. Valider avec `npx hyperframes check` "
+                "puis `npx hyperframes preview --background` avant tout `npx hyperframes render`."
+            )
 
     except Exception as e:
         print(f"ERREUR: {e}", file=sys.stderr)

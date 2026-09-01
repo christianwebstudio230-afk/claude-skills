@@ -1,0 +1,58 @@
+# Configuration client AKOMA DIGITAL LTD
+# Copier ce template dans clients/[NOM_CLIENT]/config.yaml
+
+client: "PeshNeuroeveil"
+secteur: "[Secteur d'activité]"
+contact:
+  nom: "[Prénom Nom]"
+  email: "[email@domaine.com]"
+  telephone: "[+XX XX XX XX XX]"
+  role: "[Fonction]"
+
+# Applicable si niche conciergerie ou commission
+taux_commission: null  # ex: 0.10 pour 10% — null si non applicable
+
+monnaie: "EUR"  # EUR, GBP, USD, XOF, MAD...
+fuseau_horaire: "Europe/Paris"  # ex: Africa/Abidjan, Europe/London
+
+# Niche AKOMA principale
+# Valeurs: conciergerie, restauration, pme, profession-liberale, commerce, association, immobilier
+niche_akoma: "[niche]"
+
+# Règles métier spécifiques au client
+# Ajouter ici les règles de calcul, seuils, ou logique propre au client
+regles_metier: {}
+  # exemple:
+  # frais_menage_fixe: 50.0
+  # nuits_minimum: 2
+  # taxe_sejour_par_nuit: 2.5
+
+# Chemins relatifs à la racine du projet
+chemins:
+  sorties: "clients/PeshNeuroeveil/livrables/"
+  donnees: "clients/PeshNeuroeveil/donnees/"
+
+# Réglages du module montage vidéo (scripts/montage_video_core.py)
+# Applicable uniquement si le client a un besoin de montage vidéo
+montage_video:
+  gemini_modele: "gemini-2.5-pro"
+  marge_coupe_secondes: 0.15        # marge retirée de chaque bord d'un bafouillage supprimé
+  duree_min_bafouillage: 0.3        # ignorer les hésitations plus courtes (naturel à l'oral)
+  resolution_sortie: [1920, 1080]
+  mots_cles_broll: []               # mots déclenchant un point d'insertion b-roll suggéré
+    # exemple:
+    # - "résultat"
+    # - "chiffres"
+
+  # Secours automatique et gratuit si Gemini est indisponible (clé absente, quota, réseau) :
+  # transcription locale via faster-whisper (pip install faster-whisper), aucun abonnement.
+  # Détection des bafouillages moins fine (heuristique) — toujours signalée dans le compte rendu.
+  modele_whisper: "small"           # tiny, base, small, medium, large-v3 (plus gros = plus précis, plus lent)
+  mots_de_remplissage: []           # override des mots de remplissage par défaut (euh, heu, hum, hmm)
+    # exemple:
+    # - "euh"
+    # - "genre"
+
+# Metadata
+date_creation: "2026-09-01"
+statut: "actif"  # prospect, actif, en_pause, termine
