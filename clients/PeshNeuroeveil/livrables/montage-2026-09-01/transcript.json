@@ -1,0 +1,89 @@
+{
+  "moteur": "whisper",
+  "segments": [
+    {
+      "debut": 0.0,
+      "fin": 6.06,
+      "texte": "Aujourd'hui, pour pouvoir finaliser l'inscription de votre fils avec l'association Pêche-Nauré-Eveille,",
+      "type": "propre"
+    },
+    {
+      "debut": 6.56,
+      "fin": 17.26,
+      "texte": "est-ce que vous pouvez, en quelques mots, expliquer pourquoi vous avez souhaité inscrire Maximilien avec nous ?",
+      "type": "propre"
+    },
+    {
+      "debut": 18.04,
+      "fin": 26.84,
+      "texte": "Alors j'ai souhaité inscrire Maximilien à l'association car je fais suivre Maximilien par Françoise depuis plusieurs années maintenant.",
+      "type": "propre"
+    },
+    {
+      "debut": 28.78,
+      "fin": 38.1,
+      "texte": "Donc elle m'a présenté cette association et je trouve que le fait d'avoir tous les prestataires, tous les intervenants au même endroit,",
+      "type": "propre"
+    },
+    {
+      "debut": 38.72,
+      "fin": 45.68,
+      "texte": "c'est bien pour l'enfant. Ça lui permet de ne pas se disperser, de ne pas avoir plein de rendez-vous dans la semaine,",
+      "type": "propre"
+    },
+    {
+      "debut": 45.84,
+      "fin": 55.5,
+      "texte": "de couper les journées d'école ou autre. De plus, l'association présente des locaux qui sont très bien adaptés avec du matériel.",
+      "type": "propre"
+    },
+    {
+      "debut": 56.4,
+      "fin": 63.24,
+      "texte": "Elle s'adapte, enfin même s'il y a des cadres au niveau des horaires, c'est quand même très adapté aux parents.",
+      "type": "propre"
+    },
+    {
+      "debut": 63.7,
+      "fin": 68.22,
+      "texte": "Des choses qui sont proposées pour les enfants, mais aussi pour les parents, pour les accompagnés, pour les aider.",
+      "type": "propre"
+    },
+    {
+      "debut": 68.92,
+      "fin": 74.0,
+      "texte": "Et ça on ne le trouve pas partout. Donc moi j'ai plein de confiance en l'association.",
+      "type": "propre"
+    },
+    {
+      "debut": 74.16,
+      "fin": 80.52,
+      "texte": "Je trouve que c'est une, comment ça s'appelle, une intervention, je cherche un peu mes mots,",
+      "type": "propre"
+    },
+    {
+      "debut": 80.52,
+      "fin": 90.52,
+      "texte": "mais une initiative fantastique et de pouvoir vraiment bénéficier de ces prises en charge.",
+      "type": "propre"
+    },
+    {
+      "debut": 91.74,
+      "fin": 103.72,
+      "texte": "Et puis aussi on va parler avec un tarif qui est abordable pour les familles et avec de la bienveillance envers les enfants.",
+      "type": "propre"
+    },
+    {
+      "debut": 104.4,
+      "fin": 106.96,
+      "texte": "Moi j'admire ça. Donc c'est pour ça que je passe à l'association.",
+      "type": "propre"
+    },
+    {
+      "debut": 106.96,
+      "fin": 109.58,
+      "texte": "Merci beaucoup à la belle.",
+      "type": "propre"
+    }
+  ]
+}

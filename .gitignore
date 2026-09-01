@@ -1,3 +1,10 @@
 .env
 __pycache__/
 *.pyc
+
+# Médias clients (vidéos brutes/coupées) : jamais dans l'historique Git —
+# volumineux, régénérables depuis la source + le script, et données client.
+clients/*/donnees/
+clients/*/livrables/**/*.mp4
+clients/*/livrables/**/*.mov
+clients/*/livrables/**/*.mkv

@@ -97,7 +97,7 @@ def _extraire_json(texte: str) -> list:
 def transcrire_video(
     chemin_video: Path,
     cle_api: str = None,
-    modele: str = "gemini-2.5-pro",
+    modele: str = "gemini-3.1-pro-preview",
 ) -> list[dict]:
     """
     Envoie la vidéo à Gemini, récupère la transcription segmentée avec
@@ -216,7 +216,7 @@ def transcrire_video_whisper(
 def transcrire_avec_secours(
     chemin_video: Path,
     cle_api: str = None,
-    modele_gemini: str = "gemini-2.5-pro",
+    modele_gemini: str = "gemini-3.1-pro-preview",
     modele_whisper: str = "small",
     mots_remplissage: list = None,
     autoriser_secours: bool = True,
@@ -434,7 +434,7 @@ def main():
     p_transcrire.add_argument("--video", required=True, type=Path)
     p_transcrire.add_argument("--sortie", required=True, type=Path, help="Chemin du transcript JSON produit")
     p_transcrire.add_argument("--cle-api", default=None)
-    p_transcrire.add_argument("--modele", default="gemini-2.5-pro")
+    p_transcrire.add_argument("--modele", default="gemini-3.1-pro-preview")
     p_transcrire.add_argument("--modele-whisper", default="small", help="Modèle faster-whisper pour le secours")
     p_transcrire.add_argument(
         "--moteur", choices=["auto", "gemini", "whisper"], default="auto",
@@ -533,12 +533,12 @@ def main():
                 ), "whisper"
             elif args.moteur == "gemini":
                 segments, moteur_utilise = transcrire_video(
-                    args.video, cle_api=args.cle_api, modele=config.get("gemini_modele", "gemini-2.5-pro")
+                    args.video, cle_api=args.cle_api, modele=config.get("gemini_modele", "gemini-3.1-pro-preview")
                 ), "gemini"
             else:
                 segments, moteur_utilise = transcrire_avec_secours(
                     args.video, cle_api=args.cle_api,
-                    modele_gemini=config.get("gemini_modele", "gemini-2.5-pro"),
+                    modele_gemini=config.get("gemini_modele", "gemini-3.1-pro-preview"),
                     modele_whisper=config.get("modele_whisper", "small"),
                     mots_remplissage=config.get("mots_de_remplissage"),
                     autoriser_secours=not args.sans_secours,
@@ -563,7 +563,16 @@ def main():
             )
             chemin_coupe = args.sortie_dir / "coupe.mp4"
             couper_video(args.video, plan_garder, chemin_coupe)
+            chemin_plan = chemin_coupe.with_suffix(".plan.json")
+            chemin_plan.write_text(
+                json.dumps(
+                    {"moteur": moteur_utilise, "segments": segments, "plan_garder": plan_garder},
+                    ensure_ascii=False, indent=2,
+                ),
+                encoding="utf-8",
+            )
             print(f"✅ Vidéo coupée : {chemin_coupe}")
+            print(f"✅ Plan de coupe sauvegardé : {chemin_plan}")
 
             sous_titres = construire_sous_titres(segments, plan_garder)
             chemin_sous_titres = args.sortie_dir / "sous_titres.json"
