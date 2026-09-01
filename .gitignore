@@ -16,3 +16,7 @@ clients/*/livrables/**/*.mkv
 clients/*/livrables/**/_probe/
 clients/*/livrables/**/hf-captions/
 clients/*/livrables/**/*.log
+clients/*/livrables/**/*.mp3
+clients/*/livrables/**/*.wav
+clients/*/livrables/**/snapshots/
+clients/*/livrables/**/preview/

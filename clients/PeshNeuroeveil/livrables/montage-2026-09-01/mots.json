@@ -1,0 +1,1277 @@
+[
+  {
+    "mot": "Aujourd",
+    "debut": 0.0,
+    "fin": 0.24
+  },
+  {
+    "mot": "'hui,",
+    "debut": 0.24,
+    "fin": 0.56
+  },
+  {
+    "mot": "pour",
+    "debut": 0.72,
+    "fin": 0.76
+  },
+  {
+    "mot": "pouvoir",
+    "debut": 0.76,
+    "fin": 1.22
+  },
+  {
+    "mot": "finaliser",
+    "debut": 1.22,
+    "fin": 1.94
+  },
+  {
+    "mot": "l",
+    "debut": 1.94,
+    "fin": 2.08
+  },
+  {
+    "mot": "'inscription",
+    "debut": 2.08,
+    "fin": 2.48
+  },
+  {
+    "mot": "de",
+    "debut": 2.48,
+    "fin": 3.18
+  },
+  {
+    "mot": "votre",
+    "debut": 3.18,
+    "fin": 3.36
+  },
+  {
+    "mot": "fils",
+    "debut": 3.36,
+    "fin": 3.9
+  },
+  {
+    "mot": "avec",
+    "debut": 3.9,
+    "fin": 4.44
+  },
+  {
+    "mot": "l",
+    "debut": 4.44,
+    "fin": 4.62
+  },
+  {
+    "mot": "'association",
+    "debut": 4.62,
+    "fin": 5.02
+  },
+  {
+    "mot": "Pêche",
+    "debut": 5.02,
+    "fin": 5.36
+  },
+  {
+    "mot": "-Nauré",
+    "debut": 5.36,
+    "fin": 5.7
+  },
+  {
+    "mot": "-Eveille,",
+    "debut": 5.7,
+    "fin": 6.06
+  },
+  {
+    "mot": "est",
+    "debut": 6.56,
+    "fin": 6.64
+  },
+  {
+    "mot": "-ce",
+    "debut": 6.64,
+    "fin": 6.74
+  },
+  {
+    "mot": "que",
+    "debut": 6.74,
+    "fin": 6.8
+  },
+  {
+    "mot": "vous",
+    "debut": 6.8,
+    "fin": 6.94
+  },
+  {
+    "mot": "pouvez,",
+    "debut": 6.94,
+    "fin": 7.3
+  },
+  {
+    "mot": "en",
+    "debut": 7.4,
+    "fin": 7.78
+  },
+  {
+    "mot": "quelques",
+    "debut": 7.78,
+    "fin": 7.94
+  },
+  {
+    "mot": "mots,",
+    "debut": 7.94,
+    "fin": 8.36
+  },
+  {
+    "mot": "expliquer",
+    "debut": 9.16,
+    "fin": 9.42
+  },
+  {
+    "mot": "pourquoi",
+    "debut": 9.42,
+    "fin": 9.92
+  },
+  {
+    "mot": "vous",
+    "debut": 9.92,
+    "fin": 11.64
+  },
+  {
+    "mot": "avez",
+    "debut": 11.64,
+    "fin": 12.14
+  },
+  {
+    "mot": "souhaité",
+    "debut": 12.14,
+    "fin": 14.86
+  },
+  {
+    "mot": "inscrire",
+    "debut": 14.86,
+    "fin": 15.76
+  },
+  {
+    "mot": "Maximilien",
+    "debut": 15.76,
+    "fin": 16.4
+  },
+  {
+    "mot": "avec",
+    "debut": 16.4,
+    "fin": 16.66
+  },
+  {
+    "mot": "nous",
+    "debut": 16.66,
+    "fin": 16.9
+  },
+  {
+    "mot": "?",
+    "debut": 16.9,
+    "fin": 17.25
+  },
+  {
+    "mot": "Alors,",
+    "debut": 18.02,
+    "fin": 18.34
+  },
+  {
+    "mot": "j",
+    "debut": 18.46,
+    "fin": 18.52
+  },
+  {
+    "mot": "'ai",
+    "debut": 18.52,
+    "fin": 18.54
+  },
+  {
+    "mot": "souhaité",
+    "debut": 18.54,
+    "fin": 18.78
+  },
+  {
+    "mot": "inscrire",
+    "debut": 18.78,
+    "fin": 19.0
+  },
+  {
+    "mot": "Maximilien",
+    "debut": 19.0,
+    "fin": 19.74
+  },
+  {
+    "mot": "à",
+    "debut": 19.74,
+    "fin": 20.08
+  },
+  {
+    "mot": "l",
+    "debut": 20.08,
+    "fin": 20.16
+  },
+  {
+    "mot": "'association",
+    "debut": 20.16,
+    "fin": 20.7
+  },
+  {
+    "mot": "car",
+    "debut": 20.7,
+    "fin": 20.9
+  },
+  {
+    "mot": "je",
+    "debut": 20.9,
+    "fin": 21.22
+  },
+  {
+    "mot": "fais",
+    "debut": 21.22,
+    "fin": 21.76
+  },
+  {
+    "mot": "suivre",
+    "debut": 21.76,
+    "fin": 21.92
+  },
+  {
+    "mot": "Maximilien",
+    "debut": 21.92,
+    "fin": 22.6
+  },
+  {
+    "mot": "par",
+    "debut": 22.6,
+    "fin": 23.12
+  },
+  {
+    "mot": "Françoise",
+    "debut": 23.12,
+    "fin": 24.2
+  },
+  {
+    "mot": "depuis",
+    "debut": 24.2,
+    "fin": 24.54
+  },
+  {
+    "mot": "plusieurs",
+    "debut": 24.54,
+    "fin": 25.52
+  },
+  {
+    "mot": "années",
+    "debut": 25.52,
+    "fin": 26.42
+  },
+  {
+    "mot": "maintenant.",
+    "debut": 26.42,
+    "fin": 26.84
+  },
+  {
+    "mot": "Et",
+    "debut": 28.66,
+    "fin": 29.1
+  },
+  {
+    "mot": "donc,",
+    "debut": 29.1,
+    "fin": 29.54
+  },
+  {
+    "mot": "elle",
+    "debut": 29.66,
+    "fin": 29.76
+  },
+  {
+    "mot": "m",
+    "debut": 29.76,
+    "fin": 29.88
+  },
+  {
+    "mot": "'a",
+    "debut": 29.88,
+    "fin": 29.92
+  },
+  {
+    "mot": "présenté",
+    "debut": 29.92,
+    "fin": 30.34
+  },
+  {
+    "mot": "cette",
+    "debut": 30.34,
+    "fin": 30.48
+  },
+  {
+    "mot": "association",
+    "debut": 30.48,
+    "fin": 30.96
+  },
+  {
+    "mot": "et",
+    "debut": 30.96,
+    "fin": 31.42
+  },
+  {
+    "mot": "je",
+    "debut": 31.42,
+    "fin": 31.54
+  },
+  {
+    "mot": "trouve",
+    "debut": 31.54,
+    "fin": 31.76
+  },
+  {
+    "mot": "que",
+    "debut": 31.76,
+    "fin": 31.94
+  },
+  {
+    "mot": "le",
+    "debut": 31.94,
+    "fin": 32.08
+  },
+  {
+    "mot": "fait",
+    "debut": 32.08,
+    "fin": 32.26
+  },
+  {
+    "mot": "d",
+    "debut": 32.26,
+    "fin": 32.44
+  },
+  {
+    "mot": "'avoir",
+    "debut": 32.44,
+    "fin": 32.62
+  },
+  {
+    "mot": "tous",
+    "debut": 32.62,
+    "fin": 34.04
+  },
+  {
+    "mot": "les",
+    "debut": 34.04,
+    "fin": 34.22
+  },
+  {
+    "mot": "prestataires,",
+    "debut": 34.22,
+    "fin": 35.04
+  },
+  {
+    "mot": "tous",
+    "debut": 35.4,
+    "fin": 36.46
+  },
+  {
+    "mot": "les",
+    "debut": 36.46,
+    "fin": 36.56
+  },
+  {
+    "mot": "intervenants",
+    "debut": 36.56,
+    "fin": 37.26
+  },
+  {
+    "mot": "au",
+    "debut": 37.26,
+    "fin": 37.54
+  },
+  {
+    "mot": "même",
+    "debut": 37.54,
+    "fin": 37.68
+  },
+  {
+    "mot": "endroit,",
+    "debut": 37.68,
+    "fin": 38.1
+  },
+  {
+    "mot": "c",
+    "debut": 38.72,
+    "fin": 38.74
+  },
+  {
+    "mot": "'est",
+    "debut": 38.74,
+    "fin": 38.84
+  },
+  {
+    "mot": "bien",
+    "debut": 38.84,
+    "fin": 40.1
+  },
+  {
+    "mot": "pour",
+    "debut": 40.1,
+    "fin": 40.32
+  },
+  {
+    "mot": "l",
+    "debut": 40.32,
+    "fin": 40.42
+  },
+  {
+    "mot": "'enfant.",
+    "debut": 40.42,
+    "fin": 40.74
+  },
+  {
+    "mot": "Ça",
+    "debut": 41.32,
+    "fin": 41.54
+  },
+  {
+    "mot": "lui",
+    "debut": 41.54,
+    "fin": 41.68
+  },
+  {
+    "mot": "permet",
+    "debut": 41.68,
+    "fin": 42.02
+  },
+  {
+    "mot": "de",
+    "debut": 42.02,
+    "fin": 42.34
+  },
+  {
+    "mot": "ne",
+    "debut": 42.34,
+    "fin": 42.4
+  },
+  {
+    "mot": "pas",
+    "debut": 42.4,
+    "fin": 42.54
+  },
+  {
+    "mot": "se",
+    "debut": 42.54,
+    "fin": 42.68
+  },
+  {
+    "mot": "disperser,",
+    "debut": 42.68,
+    "fin": 43.32
+  },
+  {
+    "mot": "de",
+    "debut": 43.5,
+    "fin": 43.54
+  },
+  {
+    "mot": "ne",
+    "debut": 43.54,
+    "fin": 43.64
+  },
+  {
+    "mot": "pas",
+    "debut": 43.64,
+    "fin": 43.78
+  },
+  {
+    "mot": "avoir",
+    "debut": 43.78,
+    "fin": 44.08
+  },
+  {
+    "mot": "plein",
+    "debut": 44.08,
+    "fin": 44.52
+  },
+  {
+    "mot": "de",
+    "debut": 44.52,
+    "fin": 44.64
+  },
+  {
+    "mot": "rendez",
+    "debut": 44.64,
+    "fin": 44.78
+  },
+  {
+    "mot": "-vous",
+    "debut": 44.78,
+    "fin": 45.04
+  },
+  {
+    "mot": "dans",
+    "debut": 45.04,
+    "fin": 45.2
+  },
+  {
+    "mot": "la",
+    "debut": 45.2,
+    "fin": 45.34
+  },
+  {
+    "mot": "semaine,",
+    "debut": 45.34,
+    "fin": 45.66
+  },
+  {
+    "mot": "de",
+    "debut": 45.84,
+    "fin": 45.92
+  },
+  {
+    "mot": "couper",
+    "debut": 45.92,
+    "fin": 46.2
+  },
+  {
+    "mot": "les",
+    "debut": 46.2,
+    "fin": 46.42
+  },
+  {
+    "mot": "journées",
+    "debut": 46.42,
+    "fin": 46.8
+  },
+  {
+    "mot": "d",
+    "debut": 46.8,
+    "fin": 47.04
+  },
+  {
+    "mot": "'école",
+    "debut": 47.04,
+    "fin": 47.26
+  },
+  {
+    "mot": "ou",
+    "debut": 47.26,
+    "fin": 47.66
+  },
+  {
+    "mot": "autre.",
+    "debut": 47.66,
+    "fin": 48.0
+  },
+  {
+    "mot": "De",
+    "debut": 49.5,
+    "fin": 49.8
+  },
+  {
+    "mot": "plus,",
+    "debut": 49.8,
+    "fin": 50.14
+  },
+  {
+    "mot": "l",
+    "debut": 50.72,
+    "fin": 50.9
+  },
+  {
+    "mot": "'association",
+    "debut": 50.9,
+    "fin": 51.5
+  },
+  {
+    "mot": "présente",
+    "debut": 51.5,
+    "fin": 52.06
+  },
+  {
+    "mot": "des",
+    "debut": 52.06,
+    "fin": 52.28
+  },
+  {
+    "mot": "locaux",
+    "debut": 52.28,
+    "fin": 52.56
+  },
+  {
+    "mot": "qui",
+    "debut": 52.56,
+    "fin": 52.7
+  },
+  {
+    "mot": "sont",
+    "debut": 52.7,
+    "fin": 52.92
+  },
+  {
+    "mot": "très",
+    "debut": 52.92,
+    "fin": 53.2
+  },
+  {
+    "mot": "bien",
+    "debut": 53.2,
+    "fin": 53.36
+  },
+  {
+    "mot": "adaptés,",
+    "debut": 53.36,
+    "fin": 53.92
+  },
+  {
+    "mot": "avec",
+    "debut": 53.92,
+    "fin": 54.54
+  },
+  {
+    "mot": "du",
+    "debut": 54.54,
+    "fin": 54.76
+  },
+  {
+    "mot": "matériel.",
+    "debut": 54.76,
+    "fin": 55.52
+  },
+  {
+    "mot": "Elle",
+    "debut": 56.42,
+    "fin": 56.74
+  },
+  {
+    "mot": "s",
+    "debut": 56.74,
+    "fin": 56.92
+  },
+  {
+    "mot": "'adapte,",
+    "debut": 56.92,
+    "fin": 57.4
+  },
+  {
+    "mot": "même",
+    "debut": 59.36,
+    "fin": 59.66
+  },
+  {
+    "mot": "s",
+    "debut": 59.66,
+    "fin": 59.9
+  },
+  {
+    "mot": "'il",
+    "debut": 59.9,
+    "fin": 59.98
+  },
+  {
+    "mot": "y",
+    "debut": 59.98,
+    "fin": 60.12
+  },
+  {
+    "mot": "a",
+    "debut": 60.12,
+    "fin": 60.14
+  },
+  {
+    "mot": "des",
+    "debut": 60.14,
+    "fin": 60.3
+  },
+  {
+    "mot": "cadres",
+    "debut": 60.3,
+    "fin": 60.6
+  },
+  {
+    "mot": "au",
+    "debut": 60.6,
+    "fin": 60.74
+  },
+  {
+    "mot": "niveau",
+    "debut": 60.74,
+    "fin": 60.82
+  },
+  {
+    "mot": "des",
+    "debut": 60.82,
+    "fin": 61.02
+  },
+  {
+    "mot": "horaires,",
+    "debut": 61.02,
+    "fin": 61.34
+  },
+  {
+    "mot": "c",
+    "debut": 61.58,
+    "fin": 61.58
+  },
+  {
+    "mot": "'est",
+    "debut": 61.58,
+    "fin": 62.02
+  },
+  {
+    "mot": "quand",
+    "debut": 62.02,
+    "fin": 62.12
+  },
+  {
+    "mot": "même",
+    "debut": 62.12,
+    "fin": 62.24
+  },
+  {
+    "mot": "très",
+    "debut": 62.24,
+    "fin": 62.4
+  },
+  {
+    "mot": "adapté",
+    "debut": 62.4,
+    "fin": 62.82
+  },
+  {
+    "mot": "aux",
+    "debut": 62.82,
+    "fin": 62.98
+  },
+  {
+    "mot": "parents.",
+    "debut": 62.98,
+    "fin": 63.24
+  },
+  {
+    "mot": "Les",
+    "debut": 63.76,
+    "fin": 63.88
+  },
+  {
+    "mot": "choses",
+    "debut": 63.88,
+    "fin": 64.0
+  },
+  {
+    "mot": "qui",
+    "debut": 64.0,
+    "fin": 64.12
+  },
+  {
+    "mot": "sont",
+    "debut": 64.12,
+    "fin": 64.22
+  },
+  {
+    "mot": "proposées",
+    "debut": 64.22,
+    "fin": 64.66
+  },
+  {
+    "mot": "pour",
+    "debut": 64.66,
+    "fin": 64.94
+  },
+  {
+    "mot": "les",
+    "debut": 64.94,
+    "fin": 65.08
+  },
+  {
+    "mot": "enfants,",
+    "debut": 65.08,
+    "fin": 65.4
+  },
+  {
+    "mot": "mais",
+    "debut": 65.62,
+    "fin": 65.62
+  },
+  {
+    "mot": "aussi",
+    "debut": 65.62,
+    "fin": 66.08
+  },
+  {
+    "mot": "pour",
+    "debut": 66.08,
+    "fin": 66.28
+  },
+  {
+    "mot": "les",
+    "debut": 66.28,
+    "fin": 66.4
+  },
+  {
+    "mot": "parents,",
+    "debut": 66.4,
+    "fin": 66.66
+  },
+  {
+    "mot": "pour",
+    "debut": 66.8,
+    "fin": 66.84
+  },
+  {
+    "mot": "les",
+    "debut": 66.84,
+    "fin": 66.98
+  },
+  {
+    "mot": "accompagnés,",
+    "debut": 66.98,
+    "fin": 67.62
+  },
+  {
+    "mot": "pour",
+    "debut": 67.74,
+    "fin": 67.8
+  },
+  {
+    "mot": "les",
+    "debut": 67.8,
+    "fin": 68.0
+  },
+  {
+    "mot": "aider.",
+    "debut": 68.0,
+    "fin": 68.22
+  },
+  {
+    "mot": "Et",
+    "debut": 68.94,
+    "fin": 69.0
+  },
+  {
+    "mot": "ça,",
+    "debut": 69.0,
+    "fin": 69.2
+  },
+  {
+    "mot": "on",
+    "debut": 69.3,
+    "fin": 69.36
+  },
+  {
+    "mot": "ne",
+    "debut": 69.36,
+    "fin": 69.48
+  },
+  {
+    "mot": "le",
+    "debut": 69.48,
+    "fin": 69.54
+  },
+  {
+    "mot": "trouve",
+    "debut": 69.54,
+    "fin": 69.7
+  },
+  {
+    "mot": "pas",
+    "debut": 69.7,
+    "fin": 69.9
+  },
+  {
+    "mot": "partout.",
+    "debut": 69.9,
+    "fin": 70.26
+  },
+  {
+    "mot": "Donc",
+    "debut": 71.24,
+    "fin": 71.56
+  },
+  {
+    "mot": "moi,",
+    "debut": 71.56,
+    "fin": 71.76
+  },
+  {
+    "mot": "j",
+    "debut": 71.86,
+    "fin": 71.9
+  },
+  {
+    "mot": "'ai",
+    "debut": 71.9,
+    "fin": 71.92
+  },
+  {
+    "mot": "plein",
+    "debut": 71.92,
+    "fin": 72.06
+  },
+  {
+    "mot": "de",
+    "debut": 72.06,
+    "fin": 72.84
+  },
+  {
+    "mot": "confiance",
+    "debut": 72.84,
+    "fin": 73.08
+  },
+  {
+    "mot": "en",
+    "debut": 73.08,
+    "fin": 73.36
+  },
+  {
+    "mot": "l",
+    "debut": 73.36,
+    "fin": 73.46
+  },
+  {
+    "mot": "'association.",
+    "debut": 73.46,
+    "fin": 74.0
+  },
+  {
+    "mot": "Je",
+    "debut": 74.0,
+    "fin": 74.22
+  },
+  {
+    "mot": "trouve",
+    "debut": 74.22,
+    "fin": 74.42
+  },
+  {
+    "mot": "que",
+    "debut": 74.42,
+    "fin": 74.64
+  },
+  {
+    "mot": "c",
+    "debut": 74.64,
+    "fin": 74.86
+  },
+  {
+    "mot": "'est",
+    "debut": 74.86,
+    "fin": 74.96
+  },
+  {
+    "mot": "une",
+    "debut": 74.96,
+    "fin": 75.4
+  },
+  {
+    "mot": "intervention,",
+    "debut": 75.4,
+    "fin": 77.6
+  },
+  {
+    "mot": "je",
+    "debut": 78.2,
+    "fin": 78.66
+  },
+  {
+    "mot": "cherche",
+    "debut": 78.66,
+    "fin": 79.84
+  },
+  {
+    "mot": "un",
+    "debut": 79.84,
+    "fin": 80.0
+  },
+  {
+    "mot": "peu",
+    "debut": 80.0,
+    "fin": 80.1
+  },
+  {
+    "mot": "mes",
+    "debut": 80.1,
+    "fin": 80.3
+  },
+  {
+    "mot": "mots,",
+    "debut": 80.3,
+    "fin": 80.54
+  },
+  {
+    "mot": "mais",
+    "debut": 81.14,
+    "fin": 81.5
+  },
+  {
+    "mot": "une",
+    "debut": 81.5,
+    "fin": 83.74
+  },
+  {
+    "mot": "initiative",
+    "debut": 83.74,
+    "fin": 84.3
+  },
+  {
+    "mot": "fantastique.",
+    "debut": 84.3,
+    "fin": 85.84
+  },
+  {
+    "mot": "Et",
+    "debut": 86.0,
+    "fin": 86.5
+  },
+  {
+    "mot": "de",
+    "debut": 86.5,
+    "fin": 87.52
+  },
+  {
+    "mot": "pouvoir",
+    "debut": 87.52,
+    "fin": 87.86
+  },
+  {
+    "mot": "vraiment",
+    "debut": 87.86,
+    "fin": 88.26
+  },
+  {
+    "mot": "bénéficier",
+    "debut": 88.26,
+    "fin": 89.5
+  },
+  {
+    "mot": "de",
+    "debut": 89.5,
+    "fin": 89.64
+  },
+  {
+    "mot": "ces",
+    "debut": 89.64,
+    "fin": 89.72
+  },
+  {
+    "mot": "prises",
+    "debut": 89.72,
+    "fin": 89.98
+  },
+  {
+    "mot": "en",
+    "debut": 89.98,
+    "fin": 90.12
+  },
+  {
+    "mot": "charge.",
+    "debut": 90.12,
+    "fin": 90.56
+  },
+  {
+    "mot": "Et",
+    "debut": 91.74,
+    "fin": 91.74
+  },
+  {
+    "mot": "puis",
+    "debut": 91.74,
+    "fin": 91.86
+  },
+  {
+    "mot": "aussi,",
+    "debut": 91.86,
+    "fin": 92.08
+  },
+  {
+    "mot": "on",
+    "debut": 92.12,
+    "fin": 92.12
+  },
+  {
+    "mot": "va",
+    "debut": 92.12,
+    "fin": 92.24
+  },
+  {
+    "mot": "parler",
+    "debut": 92.24,
+    "fin": 92.5
+  },
+  {
+    "mot": "avec",
+    "debut": 92.5,
+    "fin": 95.24
+  },
+  {
+    "mot": "un",
+    "debut": 95.24,
+    "fin": 95.5
+  },
+  {
+    "mot": "tarif",
+    "debut": 95.5,
+    "fin": 95.84
+  },
+  {
+    "mot": "qui",
+    "debut": 95.84,
+    "fin": 96.12
+  },
+  {
+    "mot": "est",
+    "debut": 96.12,
+    "fin": 96.22
+  },
+  {
+    "mot": "abordable",
+    "debut": 96.22,
+    "fin": 96.54
+  },
+  {
+    "mot": "pour",
+    "debut": 96.54,
+    "fin": 96.82
+  },
+  {
+    "mot": "les",
+    "debut": 96.82,
+    "fin": 96.92
+  },
+  {
+    "mot": "familles",
+    "debut": 96.92,
+    "fin": 97.2
+  },
+  {
+    "mot": "et",
+    "debut": 97.2,
+    "fin": 97.92
+  },
+  {
+    "mot": "avec",
+    "debut": 97.92,
+    "fin": 98.28
+  },
+  {
+    "mot": "de",
+    "debut": 98.28,
+    "fin": 99.36
+  },
+  {
+    "mot": "la",
+    "debut": 99.36,
+    "fin": 101.3
+  },
+  {
+    "mot": "bienveillance",
+    "debut": 101.3,
+    "fin": 102.06
+  },
+  {
+    "mot": "envers",
+    "debut": 102.06,
+    "fin": 103.26
+  },
+  {
+    "mot": "les",
+    "debut": 103.26,
+    "fin": 103.42
+  },
+  {
+    "mot": "enfants.",
+    "debut": 103.42,
+    "fin": 103.72
+  },
+  {
+    "mot": "Moi,",
+    "debut": 104.4,
+    "fin": 104.46
+  },
+  {
+    "mot": "j",
+    "debut": 104.52,
+    "fin": 104.58
+  },
+  {
+    "mot": "'admire",
+    "debut": 104.58,
+    "fin": 104.8
+  },
+  {
+    "mot": "ça.",
+    "debut": 104.8,
+    "fin": 105.0
+  },
+  {
+    "mot": "Donc",
+    "debut": 105.66,
+    "fin": 105.66
+  },
+  {
+    "mot": "c",
+    "debut": 105.66,
+    "fin": 105.8
+  },
+  {
+    "mot": "'est",
+    "debut": 105.8,
+    "fin": 105.84
+  },
+  {
+    "mot": "pour",
+    "debut": 105.84,
+    "fin": 105.96
+  },
+  {
+    "mot": "ça",
+    "debut": 105.96,
+    "fin": 106.08
+  },
+  {
+    "mot": "que",
+    "debut": 106.08,
+    "fin": 106.18
+  },
+  {
+    "mot": "je",
+    "debut": 106.18,
+    "fin": 106.24
+  },
+  {
+    "mot": "passe",
+    "debut": 106.24,
+    "fin": 106.34
+  },
+  {
+    "mot": "ici",
+    "debut": 106.34,
+    "fin": 106.46
+  },
+  {
+    "mot": "à",
+    "debut": 106.46,
+    "fin": 106.58
+  },
+  {
+    "mot": "l",
+    "debut": 106.58,
+    "fin": 106.58
+  },
+  {
+    "mot": "'association.",
+    "debut": 106.58,
+    "fin": 106.96
+  },
+  {
+    "mot": "Merci",
+    "debut": 107.82,
+    "fin": 108.3
+  },
+  {
+    "mot": "beaucoup",
+    "debut": 108.3,
+    "fin": 108.84
+  },
+  {
+    "mot": "Alabel.",
+    "debut": 108.84,
+    "fin": 109.56
+  }
+]
