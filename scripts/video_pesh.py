@@ -7,7 +7,7 @@ Charte : planche de marque Canva PESH (palette #21284A · #AA4879 · #F5367A · 
 « Comprendre · Échanger · Expérimenter · Avancer ».
 
 Usage :
-    python3 scripts/video_pesh.py <vocabulaire|corps> --medias <dossier> --sortie <fichier.mp4>
+    python3 scripts/video_pesh.py <vocabulaire|corps|matinee> --medias <dossier> --sortie <fichier.mp4>
 
 Le dossier médias contient logo_disque.png (logo officiel sur disque blanc) et les photos :
 quiestce.jpg, sherlock.jpg, coloriage.jpg, materiel.jpg, twister.jpg, assise.jpg, salle.jpg.
@@ -455,6 +455,7 @@ class Photo(Scene):
         self.f_sous = font("gras", 40)
         self.cw, self.ch, self.cy0 = 900, ch, 590
         self.photo = cover(charger(chemin), int(self.cw * 1.12), int(self.ch * 1.12), cx, cy)
+        self.centre = (cx, cy)
         self.zoom = zoom
         k = 2
         m = Image.new("L", (self.cw * k, self.ch * k), 0)
@@ -520,9 +521,10 @@ class Photo(Scene):
 class PhotoDecrire(Photo):
     """Décrire une vraie photo : des bulles pointent ce que l'on voit, puis la phrase se construit."""
 
-    def __init__(self, duree, hab, chemin, reperes, phrase, **kw):
-        super().__init__(duree, hab, chemin, "Vocabulaire", "Décrire",
-                         ["Regarder, nommer,", "puis faire une phrase."], "Je décris", **kw)
+    def __init__(self, duree, hab, chemin, reperes, phrase, sur_titre="Vocabulaire",
+                 titre="Décrire", sous_titre=("Regarder, nommer,", "puis faire une phrase."),
+                 etiquette="Je décris", **kw):
+        super().__init__(duree, hab, chemin, sur_titre, titre, list(sous_titre), etiquette, **kw)
         src = charger(chemin)
         self.taille_src = src.size
         self.reperes = reperes  # (texte, (x, y) en pixels source, (bx, by) position de la bulle)
@@ -535,7 +537,9 @@ class PhotoDecrire(Photo):
         sw, sh = self.taille_src
         bw, bh = self.photo.size
         r = max(bw / sw, bh / sh)
-        ox, oy = (sw * r - bw) / 2, (sh * r - bh) / 2
+        cx, cy = self.centre
+        ox = clamp(cx * sw * r - bw / 2, 0, sw * r - bw)
+        oy = clamp(cy * sh * r - bh / 2, 0, sh * r - bh)
         u, v = (x * r - ox) / bw, (y * r - oy) / bh
         u, v = (u - 0.5) * 1.12 + 0.5, (v - 0.5) * 1.12 + 0.5
         return W / 2 - self.cw / 2 + u * self.cw, self.cy0 + v * self.ch
@@ -681,6 +685,18 @@ class Cloture(Scene):
 
 
 # ---------------------------------------------------------------- montages
+# Repères (texte, point sur la photo source en pixels, position de la bulle à l'écran
+# relative au haut de la carte photo).
+REPERES_CARTES = [
+    ("é · clair", (560, 1060), (330, 70)),
+    ("a · no · rak", (700, 1330), (250, 470)),
+    ("trom · pette", (1280, 1650), (790, 370)),
+    ("che · val", (980, 1870), (560, 780)),
+]
+REPERES_NOMBRES = [
+    ("le nombre avant", (860, 1160), (300, 250)),
+    ("le nombre après", (1045, 1150), (780, 580)),
+]
 def montage(nom, m):
     p = lambda n: os.path.join(m, n)  # noqa: E731
     hab = Habillage(Image.open(p("logo_disque.png")).convert("RGBA"))
@@ -707,6 +723,30 @@ def montage(nom, m):
                   ["Jeux, puzzles, laçages", "et minuteur visuel."], "Matériel adapté", cy=0.55,
                   graine=6),
             Cloture(5.8, hab, ["Révéler le potentiel", "de chaque enfant"], 7),
+        ]
+    if nom == "matinee":
+        return [
+            Ouverture(3.8, hab, "SYLLABES · LECTURE · NUMÉRATION", ["MATINÉE", "STUDIEUSE"],
+                      ["che · val", "trom · pette", "3 · 4 · 5"], 21),
+            PhotoDecrire(5.6, hab, p("cartes.jpg"), REPERES_CARTES,
+                         [[("che", True), (" · ", False), ("val", True), (" : 2 syllabes,", False)],
+                          [("2 frappes dans les mains.", False)]],
+                         sur_titre="Syllabes", titre="Découper",
+                         sous_titre=("Une image, un mot,", "puis on frappe les syllabes."),
+                         etiquette="Jeu de cartes", cy=0.38, graine=22, zoom=(1.0, 1.04), ch=900),
+            Photo(4.4, hab, p("lecture2_flou.jpg"), "Lecture", "Lire",
+                  ["Suivre la ligne du doigt,", "à son rythme, même allongé."], "Coin lecture",
+                  cy=0.42, graine=23),
+            PhotoDecrire(5.6, hab, p("numeration.jpg"), REPERES_NOMBRES,
+                         [[("Avant ", False), ("4", True), (", il y a ", False), ("3", True), (".", False)],
+                          [("Après ", False), ("4", True), (", il y a ", False), ("5", True), (".", False)]],
+                         sur_titre="Numération", titre="Compter",
+                         sous_titre=("Le nombre avant,", "le nombre après."),
+                         etiquette="Fiche numération", cy=0.3, graine=24, zoom=(1.0, 1.04), ch=900),
+            Photo(4.4, hab, p("accompagner.jpg"), "Pas à pas", "Accompagner",
+                  ["Une intervenante à côté,", "pour guider sans faire à la place."],
+                  "Accompagnement", cy=0.45, graine=25),
+            Cloture(5.8, hab, ["Apprendre", "à son rythme"], 26),
         ]
     return [
         Ouverture(3.8, hab, "SE REPÉRER · BOUGER · S'AJUSTER", ["APPRIVOISER", "SON CORPS"],
@@ -828,9 +868,9 @@ def rendre(scenes, sortie, graine):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("theme", choices=["vocabulaire", "corps"])
+    ap.add_argument("theme", choices=["vocabulaire", "corps", "matinee"])
     ap.add_argument("--medias", required=True)
     ap.add_argument("--sortie", required=True)
     a = ap.parse_args()
     os.makedirs(os.path.dirname(os.path.abspath(a.sortie)), exist_ok=True)
-    rendre(montage(a.theme, a.medias), a.sortie, 1 if a.theme == "vocabulaire" else 2)
+    rendre(montage(a.theme, a.medias), a.sortie, {"vocabulaire": 1, "corps": 2, "matinee": 3}[a.theme])
