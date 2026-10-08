@@ -445,7 +445,7 @@ class Photo(Scene):
     """Sur-titre rose, titre capitales marine, sous-titre mauve, photo en carte blanche."""
 
     def __init__(self, duree, hab, chemin, sur_titre, titre, sous_titre, etiquette,
-                 cx=0.5, cy=0.5, graine=1, zoom=(1.0, 1.1)):
+                 cx=0.5, cy=0.5, graine=1, zoom=(1.0, 1.1), ch=1080):
         self.duree = duree
         self.hab = hab
         self.fond = Fond(graine)
@@ -453,7 +453,7 @@ class Photo(Scene):
         self.f_sur = font("gras", 32)
         self.f_titre = font("titre", 100)
         self.f_sous = font("gras", 40)
-        self.cw, self.ch, self.cy0 = 900, 1080, 590
+        self.cw, self.ch, self.cy0 = 900, ch, 590
         self.photo = cover(charger(chemin), int(self.cw * 1.12), int(self.ch * 1.12), cx, cy)
         self.zoom = zoom
         k = 2
@@ -513,6 +513,59 @@ class Photo(Scene):
             et = et.rotate(3, resample=Image.BICUBIC, expand=True)
             coller(c, et, 110 + et.width / 2, self.cy0 + self.ch + 8,
                    echelle=max(b, 0.01), alpha=clamp(b * 1.5))
+        img.alpha_composite(c)
+        return img.convert("RGB")
+
+
+class PhotoDecrire(Photo):
+    """Décrire une vraie photo : des bulles pointent ce que l'on voit, puis la phrase se construit."""
+
+    def __init__(self, duree, hab, chemin, reperes, phrase, **kw):
+        super().__init__(duree, hab, chemin, "Vocabulaire", "Décrire",
+                         ["Regarder, nommer,", "puis faire une phrase."], "Je décris", **kw)
+        src = charger(chemin)
+        self.taille_src = src.size
+        self.reperes = reperes  # (texte, (x, y) en pixels source, (bx, by) position de la bulle)
+        self.bulles = [pastille(txt, font("gras", 38)) for txt, _, _ in reperes]
+        self.phrase = phrase
+        self.f_txt = font("titre", 50)
+
+    def vers_ecran(self, x, y):
+        """Pixel de la photo source → position à l'écran (même recadrage que cover())."""
+        sw, sh = self.taille_src
+        bw, bh = self.photo.size
+        r = max(bw / sw, bh / sh)
+        ox, oy = (sw * r - bw) / 2, (sh * r - bh) / 2
+        u, v = (x * r - ox) / bw, (y * r - oy) / bh
+        u, v = (u - 0.5) * 1.12 + 0.5, (v - 0.5) * 1.12 + 0.5
+        return W / 2 - self.cw / 2 + u * self.cw, self.cy0 + v * self.ch
+
+    def frame(self, t):
+        img = super().frame(t).convert("RGBA")
+        c = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        d = ImageDraw.Draw(c)
+        for i, ((_, (x, y), (bx, by)), bulle) in enumerate(zip(self.reperes, self.bulles)):
+            debut = 1.2 + i * 0.55
+            px, py = self.vers_ecran(x, y)
+            g = ease_out(prog(t, debut, 0.35))
+            if g <= 0:
+                continue
+            by = self.cy0 + by
+            d.line((px, py, px + (bx - px) * g, py + (by - py) * g), fill=BLANC + (255,), width=4)
+            r = 13 * ease_back(prog(t, debut, 0.3))
+            d.ellipse((px - r - 5, py - r - 5, px + r + 5, py + r + 5), fill=BLANC + (255,))
+            d.ellipse((px - r, py - r, px + r, py + r), fill=ROSE_VIF + (255,))
+            b = ease_back(prog(t, debut + 0.25, 0.45))
+            coller(c, bulle, bx, by, echelle=max(b, 0.01), alpha=clamp(b * 1.5))
+        y = self.cy0 + self.ch + 110
+        debut = 1.2 + len(self.reperes) * 0.55 + 0.2
+        for j, ligne in enumerate(self.phrase):
+            a = ease_out(prog(t, debut + j * 0.25, 0.6))
+            if a <= 0:
+                continue
+            segs = [(s, self.f_txt, ROSE_VIF if cle else MARINE) for s, cle in ligne]
+            larg = sum(d.textlength(s, font=self.f_txt) for s, _, _ in segs)
+            texte_riche(c, segs, W / 2 - larg / 2, y + j * 68 + (1 - a) * 30, a)
         img.alpha_composite(c)
         return img.convert("RGB")
 
@@ -640,15 +693,13 @@ def montage(nom, m):
             Photo(4.3, hab, p("sherlock.jpg"), "Lecture", "Enquêter",
                   ["Lire, chercher les indices,", "raconter avec ses mots."], "P'tit Sherlock",
                   cy=0.45, graine=3),
-            CarteLignes(5.6, hab, "Vocabulaire", "Décrire", "Observer, nommer, faire une phrase.", [
-                ("Couleur", [[("Le bâton est ", False), ("orange", True)],
-                             [("et ", False), ("violet", True), (".", False)]]),
-                ("Forme", [[("Le livre est ", False), ("rectangulaire", True), (".", False)]]),
-                ("Position", [[("Le bâton est ", False), ("à côté", True)],
-                              [("du", True), (" livre.", False)]]),
-                ("Comparer", [[("Ce bâton est ", False), ("plus long", True)],
-                              [("que", True), (" l'autre.", False)]]),
-            ], "Un mot précis, dans une phrase complète.", 4),
+            PhotoDecrire(5.6, hab, p("enfant_joyeux.jpg"), [
+                ("des cheveux bouclés", (250, 250), (330, 70)),
+                ("les yeux fermés", (500, 455), (760, 300)),
+                ("un grand sourire", (640, 640), (330, 760)),
+            ], [[("Il a les ", False), ("cheveux bouclés", True)],
+                [("et un ", False), ("grand sourire", True), (".", False)]],
+                graine=4, zoom=(1.0, 1.04), ch=880),
             Photo(4.3, hab, p("coloriage.jpg"), "Motricité fine", "Nommer",
                   ["Choisir ses couleurs,", "les nommer, soigner son geste."], "Atelier créatif",
                   cy=0.5, graine=5),
