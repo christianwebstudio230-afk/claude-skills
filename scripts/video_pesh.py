@@ -726,8 +726,7 @@ def montage(nom, m):
         ]
     if nom == "matinee":
         return [
-            Ouverture(3.8, hab, "SYLLABES · LECTURE · NUMÉRATION", ["MATINÉE", "STUDIEUSE"],
-                      ["che · val", "trom · pette", "3 · 4 · 5"], 21),
+            Ouverture(3.8, hab, "SYLLABES · LECTURE · NUMÉRATION", ["MATINÉE", "STUDIEUSE"], [], 21),
             PhotoDecrire(5.6, hab, p("cartes.jpg"), REPERES_CARTES,
                          [[("che", True), (" · ", False), ("val", True), (" : 2 syllabes,", False)],
                           [("2 frappes dans les mains.", False)]],
