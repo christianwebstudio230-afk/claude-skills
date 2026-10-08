@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Vidéos promotionnelles PESH' Neuro Éveil — format Reel/Story 1080x1920, 30 i/s.
 
-Usage :
-    python3 scripts/video_pesh.py <1|2> --medias <dossier_photos> --sortie <fichier.mp4>
+Branding : kit Canva « PESH NEUROEVEIL » (logo arbre-cœur, marine + framboise,
+fonds rose pâle et lavande à formes organiques, titres Fredoka, textes Montserrat).
 
-Le dossier médias doit contenir : lecture.jpg, monnaie.jpg, boucles.jpg,
-ecouter.png, soutenir.png, apaiser.png.
-Charte : fiche marque Nat'H IA « pesh-neuro-eveil » (palette institutionnelle teal / corail).
+Usage :
+    python3 scripts/video_pesh.py <vocabulaire|corps> --medias <dossier> --sortie <fichier.mp4>
+
+Le dossier médias contient logo.png (logo détouré) et les photos :
+quiestce.jpg, sherlock.jpg, coloriage.jpg, materiel.jpg, twister.jpg, assise.jpg, salle.jpg.
 """
 import argparse
 import math
@@ -19,31 +21,31 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 W, H, FPS = 1080, 1920, 30
-XFADE = 0.6
+TRANSITION = 0.8
 
-# Palette institutionnelle PESH (fiche marque)
-TEAL = (31, 92, 82)
-CORAIL = (232, 115, 74)
-SABLE = (242, 193, 78)
-TEAL_CLAIR = (228, 238, 236)
-ENCRE = (34, 48, 44)
-CREME = (250, 246, 239)
-ROSE = (236, 64, 122)  # rappel des visuels existants de l'association
+# Palette relevée sur le logo et les gabarits Canva PESH
+MARINE = (11, 27, 77)
+FRAMBOISE = (232, 8, 110)
+PRUNE = (142, 20, 80)
+ROSE_PALE = (252, 230, 238)
+ROSE = (246, 195, 214)
+LAVANDE = (234, 221, 242)
+VIOLET = (156, 111, 181)
+BLANC = (255, 255, 255)
 
 ICI = os.path.dirname(os.path.abspath(__file__))
 FONTS = os.path.join(ICI, "assets", "fonts")
-INTER = "/usr/share/fonts/opentype/inter"
+SLOGAN = "Comprendre · Soutenir · Faire grandir"
 
 
 def font(nom, taille):
-    chemins = {
-        "titre": os.path.join(FONTS, "Playfair.ttf"),
-        "script": os.path.join(FONTS, "GreatVibes.ttf"),
-        "texte": os.path.join(INTER, "Inter-Medium.otf"),
-        "texte_gras": os.path.join(INTER, "Inter-SemiBold.otf"),
-        "texte_leger": os.path.join(INTER, "Inter-Light.otf"),
+    fichiers = {
+        "titre": "Fredoka-SemiBold.ttf",
+        "fort": "Montserrat-ExtraBold.ttf",
+        "gras": "Montserrat-Bold.ttf",
+        "texte": "Montserrat-Medium.ttf",
     }
-    return ImageFont.truetype(chemins[nom], taille)
+    return ImageFont.truetype(os.path.join(FONTS, fichiers[nom]), taille)
 
 
 # ---------------------------------------------------------------- easing
@@ -52,8 +54,7 @@ def clamp(x, a=0.0, b=1.0):
 
 
 def ease_out(x):
-    x = clamp(x)
-    return 1 - (1 - x) ** 3
+    return 1 - (1 - clamp(x)) ** 3
 
 
 def ease_in_out(x):
@@ -61,103 +62,158 @@ def ease_in_out(x):
     return 4 * x ** 3 if x < 0.5 else 1 - (-2 * x + 2) ** 3 / 2
 
 
-def apparition(t, debut, duree=0.8):
-    return ease_out((t - debut) / duree)
+def ease_back(x):
+    x = clamp(x)
+    c1 = 1.70158
+    return 1 + (c1 + 1) * (x - 1) ** 3 + c1 * (x - 1) ** 2
 
 
-# ---------------------------------------------------------------- dessin
-def texte(calque, t, contenu, police, y, couleur, debut, centre_x=W // 2,
-          glisse=40, ombre=False, duree=0.8):
-    """Texte centré qui apparaît en fondu + glissement vers le haut."""
-    a = apparition(t, debut, duree)
+def prog(t, debut, duree=0.7):
+    return clamp((t - debut) / duree)
+
+
+# ---------------------------------------------------------------- éléments graphiques
+def avec_alpha(img, a):
+    if a >= 1:
+        return img
+    img = img.copy()
+    img.putalpha(img.getchannel("A").point(lambda v: int(v * a)))
+    return img
+
+
+def coller(calque, sprite, cx, cy, echelle=1.0, alpha=1.0):
+    if echelle <= 0.01 or alpha <= 0:
+        return
+    if abs(echelle - 1) > 1e-3:
+        sprite = sprite.resize((max(1, int(sprite.width * echelle)),
+                                max(1, int(sprite.height * echelle))), Image.BICUBIC)
+    sprite = avec_alpha(sprite, alpha)
+    calque.alpha_composite(sprite, (int(cx - sprite.width / 2), int(cy - sprite.height / 2)))
+
+
+def texte(calque, t, contenu, police, x, y, couleur, debut, ancre="lm", glisse=36,
+          duree=0.7, espacement=0):
+    """Texte qui apparaît en fondu + glissement vers le haut."""
+    a = ease_out(prog(t, debut, duree))
     if a <= 0:
         return
     d = ImageDraw.Draw(calque)
     yy = y + (1 - a) * glisse
-    alpha = int(255 * a)
-    if ombre:
-        couche = Image.new("RGBA", calque.size, (0, 0, 0, 0))
-        ImageDraw.Draw(couche).text((centre_x, yy + 4), contenu, font=police,
-                                    fill=(0, 0, 0, int(140 * a)), anchor="mm")
-        couche = couche.filter(ImageFilter.GaussianBlur(8))
-        calque.alpha_composite(couche)
-    d.text((centre_x, yy), contenu, font=police, fill=couleur + (alpha,), anchor="mm")
+    fill = couleur + (int(255 * a),)
+    if not espacement:
+        d.text((x, yy), contenu, font=police, fill=fill, anchor=ancre)
+        return
+    largeur = sum(d.textlength(c, font=police) + espacement for c in contenu) - espacement
+    xx = x - largeur / 2 if ancre[0] == "m" else x
+    for c in contenu:
+        d.text((xx, yy), c, font=police, fill=fill, anchor="l" + ancre[1])
+        xx += d.textlength(c, font=police) + espacement
 
 
-def feuille_sprite(couleur, longueur=120):
-    """Feuille stylisée antialiasée (dessinée en 3x puis réduite)."""
-    k = 3
-    w, h = longueur * k, int(longueur * 0.42) * k
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+def coeur_points(cx, cy, s, n=120, fraction=1.0):
     pts = []
-    for i in range(61):
-        u = i / 60
-        pts.append((u * w, h / 2 - math.sin(math.pi * u) ** 0.9 * h / 2))
-    for i in range(61):
-        u = 1 - i / 60
-        pts.append((u * w, h / 2 + math.sin(math.pi * u) ** 0.9 * h / 2))
-    d = ImageDraw.Draw(img)
-    d.polygon(pts, fill=couleur + (255,))
-    d.line([(w * 0.05, h / 2), (w * 0.9, h / 2)], fill=(255, 255, 255, 90), width=k * 2)
-    return img.resize((longueur, int(longueur * 0.42)), Image.LANCZOS)
+    for i in range(int(n * fraction) + 1):
+        a = 2 * math.pi * i / n
+        x = 16 * math.sin(a) ** 3
+        y = 13 * math.cos(a) - 5 * math.cos(2 * a) - 2 * math.cos(3 * a) - math.cos(4 * a)
+        pts.append((cx + x * s / 34, cy - y * s / 34))
+    return pts
 
 
-def coeur_sprite(couleur, taille=80):
+def coeur_trace(taille, fraction, couleur=FRAMBOISE, epaisseur=7):
+    """Cœur dessiné au trait (comme les doodles des gabarits PESH), tracé progressif."""
     k = 3
     s = taille * k
     img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
-    pts = []
-    for i in range(200):
-        a = 2 * math.pi * i / 200
-        x = 16 * math.sin(a) ** 3
-        y = 13 * math.cos(a) - 5 * math.cos(2 * a) - 2 * math.cos(3 * a) - math.cos(4 * a)
-        pts.append((s / 2 + x * s / 36, s / 2.1 - y * s / 36))
-    ImageDraw.Draw(img).polygon(pts, fill=couleur + (255,))
+    if fraction > 0:
+        pts = coeur_points(s / 2, s / 2, s * 0.85, fraction=fraction)
+        if len(pts) > 1:
+            ImageDraw.Draw(img).line(pts, fill=couleur + (255,), width=epaisseur * k, joint="curve")
     return img.resize((taille, taille), Image.LANCZOS)
 
 
-class Feuilles:
-    """Feuilles qui flottent doucement (motif repris des visuels PESH)."""
+def coeur_plein(taille, couleur=FRAMBOISE):
+    k = 3
+    s = taille * k
+    img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    ImageDraw.Draw(img).polygon(coeur_points(s / 2, s / 2, s * 0.9), fill=couleur + (255,))
+    return img.resize((taille, taille), Image.LANCZOS)
 
-    def __init__(self, graine, n, couleurs, zone=(0, 0, W, H), bords=True):
+
+def rameau(longueur=300, couleur=VIOLET):
+    """Rameau de feuilles violettes (motif récurrent des visuels PESH)."""
+    k = 2
+    w, h = int(longueur * 0.62) * k, longueur * k
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    tige = [(w / 2 + math.sin(u * 2.4) * w * 0.08, h - u * h * 0.95) for u in np.linspace(0, 1, 40)]
+    d.line(tige, fill=couleur + (255,), width=5 * k)
+    for i, u in enumerate(np.linspace(0.18, 0.92, 6)):
+        bx, by = tige[int(u * 39)]
+        cote = 1 if i % 2 else -1
+        lg, la = w * 0.38 * (1.1 - u * 0.4), w * 0.15 * (1.1 - u * 0.4)
+        ang = math.radians(-40 * cote - 90)
+        pts = []
+        for j in range(41):
+            v = j / 40
+            px, py = v * lg, math.sin(math.pi * v) * la
+            pts.append((px, py))
+        for j in range(41):
+            v = 1 - j / 40
+            pts.append((v * lg, -math.sin(math.pi * v) * la))
+        rot = [(bx + px * math.cos(ang) * -cote - py * math.sin(ang),
+                by + px * math.sin(ang) + py * math.cos(ang)) for px, py in pts]
+        d.polygon(rot, fill=couleur + (255,))
+    return img.resize((w // k, h // k), Image.LANCZOS)
+
+
+def pastille(contenu, police, fond=BLANC, encre=MARINE, bord=FRAMBOISE, pad=(40, 22)):
+    d = ImageDraw.Draw(Image.new("RGBA", (10, 10)))
+    tw = d.textlength(contenu, font=police)
+    asc, desc = police.getmetrics()
+    w, h = int(tw + pad[0] * 2), int(asc + desc + pad[1] * 2)
+    k = 2
+    img = Image.new("RGBA", (w * k, h * k), (0, 0, 0, 0))
+    dd = ImageDraw.Draw(img)
+    dd.rounded_rectangle((0, 0, w * k - 1, h * k - 1), h * k // 2, fill=fond + (255,),
+                         outline=bord + (255,) if bord else None, width=3 * k if bord else 0)
+    img = img.resize((w, h), Image.LANCZOS)
+    ImageDraw.Draw(img).text((w / 2, h / 2), contenu, font=police, fill=encre + (255,), anchor="mm")
+    return img
+
+
+class Fond:
+    """Fond rose pâle avec deux formes organiques qui respirent (gabarits PESH)."""
+
+    def __init__(self, graine):
         rng = np.random.default_rng(graine)
-        self.items = []
-        for _ in range(n):
-            c = couleurs[rng.integers(len(couleurs))]
-            self.items.append(dict(
-                sprite=feuille_sprite(c, int(rng.uniform(70, 150))),
-                x=(rng.uniform(zone[0], zone[0] + 200) if rng.random() < 0.5
-                   else rng.uniform(zone[2] - 200, zone[2])) if bords
-                else rng.uniform(zone[0], zone[2]),
-                y=rng.uniform(zone[1], zone[3]),
-                rot=rng.uniform(0, 360), vrot=rng.uniform(-25, 25),
-                vy=rng.uniform(18, 45), amp=rng.uniform(15, 40),
-                ph=rng.uniform(0, 6.28), alpha=rng.uniform(0.55, 0.95)))
+        self.blobs = [
+            dict(cx=W * 0.92, cy=H * 0.08, r=340, c=ROSE, ph=rng.uniform(0, 6)),
+            dict(cx=W * 0.04, cy=H * 0.86, r=300, c=LAVANDE, ph=rng.uniform(0, 6)),
+            dict(cx=W * 1.02, cy=H * 0.62, r=170, c=LAVANDE, ph=rng.uniform(0, 6)),
+        ]
 
-    def dessiner(self, calque, t, opacite=1.0):
-        for f in self.items:
-            sp = f["sprite"].rotate(f["rot"] + f["vrot"] * t, resample=Image.BICUBIC, expand=True)
-            if opacite * f["alpha"] < 1:
-                a = sp.getchannel("A").point(lambda v: int(v * opacite * f["alpha"]))
-                sp.putalpha(a)
-            x = f["x"] + math.sin(t * 0.8 + f["ph"]) * f["amp"]
-            y = (f["y"] + f["vy"] * t) % (H + 200) - 100
-            calque.alpha_composite(sp, (int(x - sp.width / 2), int(y - sp.height / 2)))
+    def image(self, t):
+        e = 2
+        img = Image.new("RGBA", (W // e, H // e), ROSE_PALE + (255,))
+        d = ImageDraw.Draw(img)
+        for b in self.blobs:
+            pts = []
+            for i in range(90):
+                a = 2 * math.pi * i / 90
+                r = b["r"] * (1 + 0.07 * math.sin(3 * a + t * 0.9 + b["ph"])
+                              + 0.05 * math.sin(5 * a - t * 0.6 + b["ph"]))
+                pts.append(((b["cx"] + r * math.cos(a)) / e,
+                            (b["cy"] + r * math.sin(a) + 18 * math.sin(t * 0.7 + b["ph"])) / e))
+            d.polygon(pts, fill=b["c"] + (255,))
+        return img.resize((W, H), Image.BICUBIC)
 
 
-def degrade_bas(hauteur, couleur, alpha_max=235):
-    g = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    col = np.zeros((H, 1, 4), dtype=np.uint8)
-    col[..., :3] = couleur
-    y0 = H - hauteur
-    ys = np.arange(H)
-    a = np.clip((ys - y0) / hauteur, 0, 1) ** 1.4 * alpha_max
-    col[:, 0, 3] = a.astype(np.uint8)
-    return Image.fromarray(np.repeat(col, W, axis=1), "RGBA")
+def charger(chemin):
+    return ImageOps.exif_transpose(Image.open(chemin)).convert("RGB")
 
 
 def cover(img, w, h, cx=0.5, cy=0.5):
-    """Recadre img pour remplir w x h, centré sur (cx, cy) en proportion."""
     r = max(w / img.width, h / img.height)
     img = img.resize((math.ceil(img.width * r), math.ceil(img.height * r)), Image.LANCZOS)
     x = int(clamp(cx * img.width - w / 2, 0, img.width - w))
@@ -165,336 +221,325 @@ def cover(img, w, h, cx=0.5, cy=0.5):
     return img.crop((x, y, x + w, y + h))
 
 
-def charger(chemin):
-    return ImageOps.exif_transpose(Image.open(chemin)).convert("RGB")
+class Habillage:
+    """Éléments communs : badge logo, pied de page (comme le gabarit Reel Canva)."""
+
+    def __init__(self, logo):
+        self.badge = Image.new("RGBA", (220, 220), (0, 0, 0, 0))
+        k = 3
+        rond = Image.new("RGBA", (220 * k, 220 * k), (0, 0, 0, 0))
+        ImageDraw.Draw(rond).ellipse((6 * k, 6 * k, 214 * k, 214 * k), fill=BLANC + (255,))
+        self.badge.alpha_composite(rond.resize((220, 220), Image.LANCZOS))
+        petit = logo.copy()
+        petit.thumbnail((170, 170), Image.LANCZOS)
+        self.badge.alpha_composite(petit, ((220 - petit.width) // 2, (220 - petit.height) // 2))
+        self.f_pied = font("gras", 26)
+        self.f_pied2 = font("texte", 26)
+
+    def dessiner(self, calque, t, badge=True):
+        if badge:
+            a = ease_back(prog(t, 0.15, 0.6))
+            coller(calque, self.badge, W - 150, 170, echelle=0.65 * max(a, 0.01), alpha=clamp(a))
+        d = ImageDraw.Draw(calque)
+        d.line((70, 1812, W - 70, 1812), fill=MARINE + (60,), width=2)
+        d.text((70, 1856), "PESH NEURO-ÉVEIL", font=self.f_pied, fill=MARINE + (255,), anchor="lm")
+        d.text((W - 70, 1856), SLOGAN, font=self.f_pied2, fill=MARINE + (255,), anchor="rm")
 
 
 # ---------------------------------------------------------------- scènes
 class Scene:
     duree = 4.0
 
-    def frame(self, t):  # -> Image RGB W x H
+    def frame(self, t):
         raise NotImplementedError
 
 
-class KenBurns(Scene):
-    """Photo plein cadre avec zoom lent + légende manuscrite et sous-titre."""
+class Ouverture(Scene):
+    """Logo qui éclot, titre du thème, pastilles de mots qui surgissent."""
 
-    def __init__(self, chemin, duree, mot, sous_titre, cx=0.5, cy=0.5,
-                 zoom=(1.0, 1.12), derive=(0, -0.02), legende=True):
+    def __init__(self, duree, logo, titre, sous_titre, mots, graine):
         self.duree = duree
-        marge = 1.18
-        self.base = cover(charger(chemin), int(W * marge), int(H * marge), cx, cy)
-        self.zoom, self.derive = zoom, derive
-        self.mot, self.sous_titre, self.legende = mot, sous_titre, legende
-        self.grad = degrade_bas(900, ENCRE, 225)
-        self.f_mot = font("script", 190)
-        self.f_sous = font("texte", 54)
+        self.fond = Fond(graine)
+        self.logo = logo.copy()
+        self.logo.thumbnail((600, 600), Image.LANCZOS)
+        self.titre, self.sous_titre = titre, sous_titre
+        self.f_titre = font("titre", 112)
+        self.f_sous = font("gras", 34)
+        self.pastilles = [pastille(m, font("gras", 40)) for m in mots]
+        self.rameau = rameau(280)
 
-    def fond(self, t):
+    def frame(self, t):
+        img = self.fond.image(t)
+        c = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        coller(c, self.rameau.rotate(18 + 4 * math.sin(t * 1.3), resample=Image.BICUBIC, expand=True),
+               150, 1470, alpha=ease_out(prog(t, 0.4, 0.8)))
+        a = ease_back(prog(t, 0.0, 0.9))
+        coller(c, self.logo, W / 2, 520, echelle=max(a, 0.01), alpha=clamp(a * 1.4))
+        for i, ligne in enumerate(self.titre):
+            texte(c, t, ligne, self.f_titre, W / 2, 940 + i * 125, MARINE, 0.7 + i * 0.15, ancre="mm")
+        y = 940 + len(self.titre) * 125 + 10
+        texte(c, t, self.sous_titre, self.f_sous, W / 2, y, FRAMBOISE, 1.1, ancre="mm", espacement=3)
+        positions = [(300, 1420), (760, 1470), (430, 1590), (800, 1640), (330, 1720)]
+        for i, p in enumerate(self.pastilles):
+            a = ease_back(prog(t, 1.4 + i * 0.22, 0.55))
+            x, y = positions[i % len(positions)]
+            y += 8 * math.sin(t * 2 + i)
+            coller(c, p, x, y, echelle=max(a, 0.01), alpha=clamp(a * 1.5))
+        img.alpha_composite(c)
+        return img.convert("RGB")
+
+
+class Photo(Scene):
+    """Gabarit Reel PESH : sur-titre, titre, sous-titre, photo en carte arrondie, étiquette."""
+
+    def __init__(self, duree, habillage, chemin, sur_titre, titre, sous_titre, etiquette,
+                 cx=0.5, cy=0.5, graine=1, zoom=(1.0, 1.1)):
+        self.duree = duree
+        self.hab = habillage
+        self.fond = Fond(graine)
+        self.sur_titre, self.titre, self.sous_titre = sur_titre, titre, sous_titre
+        self.f_sur = font("gras", 30)
+        self.f_titre = font("titre", 116)
+        self.f_sous = font("texte", 42)
+        self.cw, self.ch, self.cy0 = 940, 1110, 560
+        self.photo = cover(charger(chemin), int(self.cw * 1.12), int(self.ch * 1.12), cx, cy)
+        self.zoom = zoom
+        k = 2
+        m = Image.new("L", (self.cw * k, self.ch * k), 0)
+        ImageDraw.Draw(m).rounded_rectangle((0, 0, self.cw * k, self.ch * k), 60 * k, fill=255)
+        self.masque = m.resize((self.cw, self.ch), Image.LANCZOS)
+        cadre = Image.new("RGBA", (self.cw + 80, self.ch + 80), (0, 0, 0, 0))
+        ImageDraw.Draw(cadre).rounded_rectangle((40, 52, 40 + self.cw, 52 + self.ch), 60,
+                                                fill=MARINE + (70,))
+        self.ombre = cadre.filter(ImageFilter.GaussianBlur(22))
+        self.etiquette = pastille(etiquette, font("gras", 40), fond=FRAMBOISE, encre=BLANC, bord=None)
+        self.coeur = coeur_plein(40, BLANC)
+
+    def carte(self, t):
         p = ease_in_out(t / self.duree)
         z = self.zoom[0] + (self.zoom[1] - self.zoom[0]) * p
-        cw, ch = W * (self.base.width / W) / z, H * (self.base.height / H) / z
-        cx = self.base.width / 2 + self.derive[0] * self.base.width * p
-        cy = self.base.height / 2 + self.derive[1] * self.base.height * p
-        box = (cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2)
-        return self.base.resize((W, H), Image.BICUBIC, box=box).convert("RGBA")
-
-    def frame(self, t):
-        img = self.fond(t)
-        if self.legende:
-            img.alpha_composite(self.grad)
-            calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-            texte(calque, t, self.mot, self.f_mot, 1330, (255, 255, 255), 0.35, ombre=True)
-            barre = apparition(t, 0.8, 0.7)
-            if barre > 0:
-                lw = int(140 * barre)
-                ImageDraw.Draw(calque).rounded_rectangle(
-                    (W // 2 - lw // 2, 1452, W // 2 + lw // 2, 1460), 4, fill=CORAIL + (255,))
-            for i, ligne in enumerate(self.sous_titre):
-                texte(calque, t, ligne, self.f_sous, 1530 + i * 72, (255, 255, 255), 0.9 + i * 0.15)
-            img.alpha_composite(calque)
-        return img.convert("RGB")
-
-
-class CartePhoto(KenBurns):
-    """Photo paysage : fond flouté + carte arrondie (évite un recadrage trop serré)."""
-
-    def __init__(self, chemin, duree, mot, sous_titre, **kw):
-        super().__init__(chemin, duree, mot, sous_titre, **kw)
-        src = charger(chemin)
-        self.flou = cover(src, W, H).filter(ImageFilter.GaussianBlur(40)).convert("RGBA")
-        self.flou.alpha_composite(Image.new("RGBA", (W, H), TEAL + (120,)))
-        cw = W - 120
-        ch = int(cw * 1.08)
-        self.carte = cover(src, int(cw * 1.12), int(ch * 1.12), 0.42, 0.55)
-        self.cw, self.ch = cw, ch
-        m = Image.new("L", (cw, ch), 0)
-        ImageDraw.Draw(m).rounded_rectangle((0, 0, cw, ch), 48, fill=255)
-        self.masque = m
-        ombre = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        ImageDraw.Draw(ombre).rounded_rectangle((60, 230, 60 + cw, 230 + ch + 20), 48,
-                                                fill=(0, 0, 0, 110))
-        self.ombre = ombre.filter(ImageFilter.GaussianBlur(30))
-
-    def fond(self, t):
-        p = ease_in_out(t / self.duree)
-        z = 1.0 + 0.1 * p
-        bw, bh = self.carte.size
+        bw, bh = self.photo.size
         cw, ch = bw / 1.12 / z, bh / 1.12 / z
-        cx, cy = bw / 2 + 0.03 * bw * p, bh / 2
-        photo = self.carte.resize((self.cw, self.ch), Image.BICUBIC,
-                                  box=(cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2))
-        img = self.flou.copy()
-        a = apparition(t, 0.0, 0.9)
-        y = 200 + int((1 - a) * 60)
-        img.alpha_composite(self.ombre)
-        img.paste(photo, (60, y), self.masque)
+        box = (bw / 2 - cw / 2, bh / 2 - ch / 2, bw / 2 + cw / 2, bh / 2 + ch / 2)
+        img = self.photo.resize((self.cw, self.ch), Image.BICUBIC, box=box).convert("RGBA")
+        img.putalpha(self.masque)
         return img
 
-
-class Visuel(Scene):
-    """Visuel existant de l'association (texte déjà intégré) : zoom doux seulement."""
-
-    def __init__(self, chemin, duree):
-        self.duree = duree
-        self.img = cover(charger(chemin), W, H)
-
     def frame(self, t):
-        z = 1.0 + 0.07 * ease_in_out(t / self.duree)
-        cw, ch = W / z, H / z
-        box = ((W - cw) / 2, (H - ch) / 2, (W + cw) / 2, (H + ch) / 2)
-        return self.img.resize((W, H), Image.BICUBIC, box=box)
+        img = self.fond.image(t)
+        c = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        texte(c, t, self.sur_titre.upper(), self.f_sur, 70, 190, FRAMBOISE, 0.1, espacement=4)
+        texte(c, t, self.titre, self.f_titre, 66, 296, MARINE, 0.2, glisse=50)
+        tw = ImageDraw.Draw(c).textlength(self.titre, font=self.f_titre)
+        if t > 0.6:
+            coller(c, coeur_trace(76, ease_in_out(prog(t, 0.6, 0.9))), 66 + tw + 60, 300)
+        for i, ligne in enumerate(self.sous_titre):
+            texte(c, t, ligne, self.f_sous, 70, 410 + i * 54, MARINE, 0.45 + i * 0.12)
+        self.hab.dessiner(c, t)
+        img.alpha_composite(c)
 
-
-class Ouverture(Scene):
-    """Carte d'ouverture : cercle teal qui s'ouvre, nom de l'association."""
-
-    def __init__(self, duree, sur_titre, accroche):
-        self.duree = duree
-        self.sur_titre, self.accroche = sur_titre, accroche
-        self.feuilles = Feuilles(3, 9, [CORAIL, ROSE, SABLE])
-        self.f_petit = font("texte_gras", 40)
-        self.f_nom = font("titre", 112)
-        self.f_nom2 = font("titre", 84)
-        self.f_acc = font("script", 120)
-
-    def frame(self, t):
-        img = Image.new("RGBA", (W, H), CREME + (255,))
-        calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        r = int(1150 * ease_out(t / 1.4))
-        ImageDraw.Draw(calque).ellipse((W // 2 - r, 900 - r, W // 2 + r, 900 + r), fill=TEAL + (255,))
-        img.alpha_composite(calque)
-        calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        self.feuilles.dessiner(calque, t, opacite=apparition(t, 0.5, 1.0) * 0.85)
-        img.alpha_composite(calque)
-        calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        texte(calque, t, self.sur_titre, self.f_petit, 640, SABLE, 0.6)
-        texte(calque, t, "PESH'", self.f_nom, 790, (255, 255, 255), 0.8)
-        texte(calque, t, "Neuro Éveil", self.f_nom2, 920, (255, 255, 255), 1.0)
-        a = apparition(t, 1.3, 0.6)
+        a = ease_out(prog(t, 0.25, 0.8))
         if a > 0:
-            lw = int(220 * a)
-            ImageDraw.Draw(calque).rounded_rectangle(
-                (W // 2 - lw // 2, 1010, W // 2 + lw // 2, 1018), 4, fill=CORAIL + (255,))
-        texte(calque, t, self.accroche, self.f_acc, 1150, TEAL_CLAIR, 1.5, duree=1.0)
-        img.alpha_composite(calque)
+            s = 0.9 + 0.1 * a
+            carte = Image.new("RGBA", self.ombre.size, (0, 0, 0, 0))
+            carte.alpha_composite(self.ombre)
+            carte.alpha_composite(self.carte(t), (40, 40))
+            cy = self.cy0 + self.ch / 2 + (1 - a) * 80
+            coller(img, carte, W / 2, cy, echelle=s, alpha=a)
+
+        b = ease_back(prog(t, 1.0, 0.6))
+        if b > 0:
+            et = Image.new("RGBA", (self.etiquette.width + 70, self.etiquette.height), (0, 0, 0, 0))
+            et.alpha_composite(self.etiquette, (70, 0))
+            pill_h = self.etiquette.height
+            rond = Image.new("RGBA", (pill_h, pill_h), (0, 0, 0, 0))
+            ImageDraw.Draw(rond).ellipse((0, 0, pill_h - 1, pill_h - 1), fill=PRUNE + (255,))
+            rond.alpha_composite(self.coeur, ((pill_h - 40) // 2, (pill_h - 38) // 2))
+            et.alpha_composite(rond, (0, 0))
+            et = et.rotate(4, resample=Image.BICUBIC, expand=True)
+            coller(img, et, 110 + et.width / 2, self.cy0 + self.ch - 10,
+                   echelle=max(b, 0.01), alpha=clamp(b * 1.5))
         return img.convert("RGB")
 
 
-class Question(Scene):
-    """Plein écran texte sur fond teal profond, lignes successives."""
+class Mots(Scene):
+    """Typographie cinétique : un verbe, puis le vocabulaire qui s'empile en pastilles."""
 
-    def __init__(self, duree, lignes):
+    def __init__(self, duree, habillage, sur_titre, titre, mots, phrase, graine):
         self.duree = duree
-        self.lignes = lignes  # (texte, police, y, couleur, debut)
-        self.feuilles = Feuilles(11, 6, [CORAIL, ROSE])
+        self.hab = habillage
+        self.fond = Fond(graine)
+        self.sur_titre, self.titre, self.phrase = sur_titre, titre, phrase
+        self.f_sur = font("gras", 30)
+        self.f_titre = font("titre", 150)
+        self.f_phrase = font("titre", 56)
+        self.mots = [pastille(m, font("gras", 50), pad=(48, 26)) for m in mots]
+        self.rameau = rameau(300)
 
     def frame(self, t):
-        img = Image.new("RGBA", (W, H), TEAL + (255,))
-        calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        self.feuilles.dessiner(calque, t, opacite=0.6)
-        for contenu, police, y, couleur, debut in self.lignes:
-            texte(calque, t, contenu, police, y, couleur, debut)
-        img.alpha_composite(calque)
-        return img.convert("RGB")
-
-
-class CarteOffre(Scene):
-    """Présentation d'une offre : titre, cadre, puces de réassurance."""
-
-    def __init__(self, duree, etiquette, titre, cadre, puces, couleur=TEAL):
-        self.duree = duree
-        self.etiquette, self.titre, self.cadre, self.puces = etiquette, titre, cadre, puces
-        self.couleur = couleur
-        self.feuilles = Feuilles(7, 5, [CORAIL, SABLE], zone=(0, 0, W, 500))
-        self.coeur = coeur_sprite(CORAIL, 46)
-        self.f_eti = font("texte_gras", 36)
-        self.f_titre = font("titre", 86)
-        self.f_cadre = font("texte", 42)
-        self.f_puce = font("texte", 46)
-
-    def frame(self, t):
-        img = Image.new("RGBA", (W, H), CREME + (255,))
-        calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        self.feuilles.dessiner(calque, t, opacite=0.7)
-        img.alpha_composite(calque)
-        calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        d = ImageDraw.Draw(calque)
-        a = apparition(t, 0.1, 0.6)
+        img = self.fond.image(t)
+        c = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        coller(c, self.rameau.rotate(-20 + 4 * math.sin(t * 1.2), resample=Image.BICUBIC,
+                                     expand=True), W - 140, 1450, alpha=ease_out(prog(t, 0.3, 0.8)))
+        texte(c, t, self.sur_titre.upper(), self.f_sur, W / 2, 360, FRAMBOISE, 0.0, ancre="mm",
+              espacement=4)
+        a = ease_back(prog(t, 0.1, 0.6))
         if a > 0:
-            bw = d.textlength(self.etiquette, font=self.f_eti) + 70
-            d.rounded_rectangle((W / 2 - bw / 2, 520 - 38, W / 2 + bw / 2, 520 + 38), 38,
-                                fill=self.couleur + (int(255 * a),))
-            d.text((W / 2, 520), self.etiquette, font=self.f_eti,
-                   fill=(255, 255, 255, int(255 * a)), anchor="mm")
-        y = 680
-        for i, ligne in enumerate(self.titre):
-            texte(calque, t, ligne, self.f_titre, y + i * 105, ENCRE, 0.35 + i * 0.12)
-        y += len(self.titre) * 105 + 20
-        texte(calque, t, self.cadre, self.f_cadre, y, CORAIL, 0.8)
-        y += 140
-        for i, puce in enumerate(self.puces):
-            debut = 1.3 + i * 0.45
-            a = apparition(t, debut, 0.7)
-            if a <= 0:
-                continue
-            yy = y + i * 125
-            d.rounded_rectangle((90, yy - 50, W - 90, yy + 50), 50,
-                                fill=TEAL_CLAIR + (int(255 * a),))
-            c = self.coeur.copy()
-            c.putalpha(c.getchannel("A").point(lambda v: int(v * a)))
-            calque.alpha_composite(c, (130, int(yy - 23)))
-            d.text((205 - (1 - a) * 30, yy), puce, font=self.f_puce,
-                   fill=ENCRE + (int(255 * a),), anchor="lm")
-        img.alpha_composite(calque)
+            sp = Image.new("RGBA", (W, 220), (0, 0, 0, 0))
+            ImageDraw.Draw(sp).text((W / 2, 110), self.titre, font=self.f_titre, fill=MARINE + (255,),
+                                    anchor="mm")
+            coller(c, sp, W / 2, 500, echelle=max(a, 0.01), alpha=clamp(a * 1.5))
+        for i, m in enumerate(self.mots):
+            a = ease_back(prog(t, 0.6 + i * 0.28, 0.5))
+            dx = (-1) ** i * 110
+            y = 720 + i * 135 + 6 * math.sin(t * 2.2 + i)
+            coller(c, m, W / 2 + dx, y, echelle=max(a, 0.01), alpha=clamp(a * 1.5))
+        y = 720 + len(self.mots) * 135 + 40
+        for i, ligne in enumerate(self.phrase):
+            texte(c, t, ligne, self.f_phrase, W / 2, y + i * 72, PRUNE,
+                  0.8 + len(self.mots) * 0.28 + i * 0.15, ancre="mm")
+        self.hab.dessiner(c, t)
+        img.alpha_composite(c)
         return img.convert("RGB")
 
 
 class Cloture(Scene):
-    """Carte de fin : signature, lieu, appel à l'action."""
+    """Carte de fin : logo, promesse, lieu, bouton « Rejoignez-nous »."""
 
-    def __init__(self, duree, phrase, cta):
+    def __init__(self, duree, logo, phrase, graine):
         self.duree = duree
-        self.phrase, self.cta = phrase, cta
-        self.feuilles = Feuilles(5, 8, [CORAIL, ROSE, SABLE])
-        self.coeur = coeur_sprite(ROSE, 70)
-        self.f_phrase = font("script", 104)
-        self.f_nom = font("titre", 92)
-        self.f_info = font("texte", 40)
-        self.f_info_l = font("texte_leger", 38)
-        self.f_cta = font("texte_gras", 44)
+        self.fond = Fond(graine)
+        self.logo = logo.copy()
+        self.logo.thumbnail((520, 520), Image.LANCZOS)
+        self.phrase = phrase
+        self.f_phrase = font("titre", 74)
+        self.f_slogan = font("gras", 32)
+        self.f_info = font("texte", 36)
+        self.f_cta = font("titre", 60)
+        self.f_tags = font("gras", 30)
+        self.coeur = coeur_plein(54, BLANC)
+        self.rameau = rameau(260)
 
     def frame(self, t):
-        img = Image.new("RGBA", (W, H), TEAL + (255,))
-        calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        self.feuilles.dessiner(calque, t, opacite=0.75)
-        img.alpha_composite(calque)
-        calque = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        d = ImageDraw.Draw(calque)
+        img = self.fond.image(t)
+        c = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        coller(c, self.rameau.rotate(15 + 4 * math.sin(t * 1.3), resample=Image.BICUBIC, expand=True),
+               130, 560, alpha=ease_out(prog(t, 0.4, 0.8)))
+        a = ease_back(prog(t, 0.0, 0.8))
+        coller(c, self.logo, W / 2, 470, echelle=max(a * (1 + 0.015 * math.sin(t * 2.5)), 0.01),
+               alpha=clamp(a * 1.4))
+        texte(c, t, SLOGAN.upper(), self.f_slogan, W / 2, 790, FRAMBOISE, 0.5, ancre="mm", espacement=2)
         for i, ligne in enumerate(self.phrase):
-            texte(calque, t, ligne, self.f_phrase, 470 + i * 125, (255, 255, 255), 0.2 + i * 0.25)
-        a = apparition(t, 0.9, 0.7)
-        if a > 0:
-            battement = 1 + 0.08 * max(0, math.sin((t - 0.9) * 4.0))
-            s = int(70 * a * battement)
-            c = self.coeur.resize((max(s, 1), max(s, 1)), Image.LANCZOS)
-            calque.alpha_composite(c, (W // 2 - s // 2, 800 - s // 2))
-        texte(calque, t, "PESH' Neuro Éveil", self.f_nom, 960, (255, 255, 255), 1.1)
-        texte(calque, t, "Association · Troubles du Neuro-Développement", self.f_info, 1060,
-              SABLE, 1.3)
-        texte(calque, t, "Enfants · adultes · familles", self.f_info_l, 1120, TEAL_CLAIR, 1.4)
-        texte(calque, t, "11 rue de l'Arbalète · 77100 Meaux", self.f_info_l, 1180, TEAL_CLAIR, 1.5)
-        a = apparition(t, 1.9, 0.7)
-        if a > 0:
-            pulse = 1 + 0.03 * math.sin(max(0, t - 2.6) * 3.5)
-            bw = (d.textlength(self.cta, font=self.f_cta) + 110) * pulse
-            bh = 116 * pulse
-            yc = 1380 + (1 - a) * 40
-            d.rounded_rectangle((W / 2 - bw / 2, yc - bh / 2, W / 2 + bw / 2, yc + bh / 2),
-                                bh / 2, fill=CORAIL + (int(255 * a),))
-            d.text((W / 2, yc), self.cta, font=self.f_cta,
-                   fill=(255, 255, 255, int(255 * a)), anchor="mm")
-        texte(calque, t, "#PESHNeuroEveil  ·  #Meaux", self.f_info_l, 1510, TEAL_CLAIR, 2.3)
-        img.alpha_composite(calque)
+            texte(c, t, ligne, self.f_phrase, W / 2, 920 + i * 92, MARINE, 0.7 + i * 0.15, ancre="mm")
+        y = 920 + len(self.phrase) * 92 + 50
+        texte(c, t, "Association · enfants, adultes et familles", self.f_info, W / 2, y, MARINE, 1.1,
+              ancre="mm")
+        texte(c, t, "11 rue de l'Arbalète · 77100 Meaux", self.f_info, W / 2, y + 56, MARINE, 1.2,
+              ancre="mm")
+        b = ease_back(prog(t, 1.6, 0.6))
+        if b > 0:
+            pulse = 1 + 0.025 * math.sin(max(0, t - 2.2) * 4)
+            d = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
+            tw = d.textlength("Rejoignez-nous", font=self.f_cta)
+            bw, bh = int(tw + 200), 140
+            k = 2
+            btn = Image.new("RGBA", (bw * k, bh * k), (0, 0, 0, 0))
+            ImageDraw.Draw(btn).rounded_rectangle((0, 0, bw * k, bh * k), bh * k // 2,
+                                                  fill=FRAMBOISE + (255,))
+            btn = btn.resize((bw, bh), Image.LANCZOS)
+            btn.alpha_composite(self.coeur, (52, (bh - 52) // 2))
+            ImageDraw.Draw(btn).text((bw / 2 + 36, bh / 2), "Rejoignez-nous", font=self.f_cta,
+                                     fill=BLANC + (255,), anchor="mm")
+            coller(c, btn, W / 2, y + 230, echelle=max(b * pulse, 0.01), alpha=clamp(b * 1.5))
+        texte(c, t, "Adhésion et inscriptions sur HelloAsso", self.f_info, W / 2, y + 360, PRUNE, 2.1,
+              ancre="mm")
+        texte(c, t, "#PESHNeuroEveil  #Meaux", self.f_tags, W / 2, y + 430, FRAMBOISE, 2.3, ancre="mm")
+        img.alpha_composite(c)
         return img.convert("RGB")
 
 
 # ---------------------------------------------------------------- montages
-def montage(numero, m):
+def montage(nom, m):
     p = lambda n: os.path.join(m, n)  # noqa: E731
-    if numero == 1:
+    logo = Image.open(p("logo.png")).convert("RGBA")
+    logo = logo.crop(logo.getbbox())
+    hab = Habillage(logo)
+    if nom == "vocabulaire":
         return [
-            Ouverture(3.4, "ASSOCIATION · MEAUX", "Révéler le potentiel"),
-            CartePhoto(p("lecture.jpg"), 4.4, "Apprendre",
-                       ["à son rythme,", "avec des outils adaptés"]),
-            KenBurns(p("monnaie.jpg"), 4.4, "Comprendre",
-                     ["par le concret,", "en manipulant, en jouant"], cx=0.5, cy=0.42),
-            KenBurns(p("boucles.jpg"), 4.4, "Grandir",
-                     ["en autonomie,", "un geste après l'autre"], cx=0.5, cy=0.55,
-                     derive=(0, 0.02)),
-            Visuel(p("apaiser.png"), 3.4),
-            Cloture(5.6, ["Chaque enfant", "a un potentiel."], "Adhésion sur HelloAsso"),
+            Ouverture(3.8, logo, ["Vocabulaire", "& observation"], "APPRENDRE EN JOUANT",
+                      ["Il a des lunettes ?", "Elle sourit ?", "Cheveux bouclés ?"], 1),
+            Photo(4.3, hab, p("quiestce.jpg"), "Observation", "Observer",
+                  ["Poser des questions,", "repérer les détails."], "Qui est-ce ?", cy=0.45, graine=2),
+            Photo(4.3, hab, p("sherlock.jpg"), "Lecture", "Enquêter",
+                  ["Lire, chercher les indices,", "raconter avec ses mots."], "P'tit Sherlock",
+                  cy=0.45, graine=3),
+            Mots(4.0, hab, "Vocabulaire", "Décrire", ["rouge", "plus long que", "à côté de", "lisse"],
+                 ["Mettre des mots", "sur ce que l'on voit."], 4),
+            Photo(4.3, hab, p("coloriage.jpg"), "Motricité fine", "Nommer",
+                  ["Choisir ses couleurs,", "les nommer, soigner son geste."], "Atelier créatif",
+                  cy=0.5, graine=5),
+            Photo(4.0, hab, p("materiel.jpg"), "Outils adaptés", "Manipuler",
+                  ["Jeux, puzzles, laçages", "et minuteur visuel."], "Matériel adapté", cy=0.55,
+                  graine=6),
+            Cloture(5.8, logo, ["Révéler le potentiel", "de chaque enfant"], 7),
         ]
-    titre, texte_m = font("titre", 76), font("texte_leger", 48)
     return [
-        Question(4.4, [
-            ("Vous accompagnez", texte_m, 700, TEAL_CLAIR, 0.2),
-            ("un enfant avec un TND ?", texte_m, 770, TEAL_CLAIR, 0.45),
-            ("Et vous,", font("script", 150), 1000, (255, 255, 255), 1.6),
-            ("qui prend soin de vous ?", titre, 1140, SABLE, 2.1),
-        ]),
-        Visuel(p("ecouter.png"), 3.6),
-        CarteOffre(5.2, "PARCOURS MENSUEL · LE LUNDI SOIR", ["L'Art de", "se ressourcer"],
-                   "Prévention et mieux-être · Meaux",
-                   ["Aucune compétence artistique", "8 participantes maximum",
-                    "Vous participez à votre rythme"]),
-        Visuel(p("soutenir.png"), 3.4),
-        CarteOffre(4.6, "LE MARDI SOIR", ["L'Apéro", "des parents"],
-                   "Échanges libres · aucun thème imposé",
-                   ["Entre parents qui comprennent", "Gratuit pour les adhérents"],
-                   couleur=CORAIL),
-        Cloture(5.6, ["Prendre soin de vous,", "c'est aussi prendre", "soin d'eux."],
-                "Rejoignez-nous sur HelloAsso"),
+        Ouverture(3.8, logo, ["Apprivoiser", "son corps"], "SE REPÉRER · BOUGER · S'AJUSTER",
+                  ["droite", "gauche", "devant", "derrière"], 11),
+        Photo(4.4, hab, p("twister.jpg"), "Schéma corporel", "Se repérer",
+              ["Main droite sur le rouge !", "Latéralité, équilibre, coordination."], "Twister",
+              cy=0.5, graine=12),
+        Mots(4.2, hab, "Vocabulaire du corps", "Nommer",
+             ["la tête", "les épaules", "les genoux", "les pieds"],
+             ["Mettre des mots", "sur son propre corps."], 13),
+        Photo(4.4, hab, p("assise.jpg"), "Appréhension du corps", "S'ajuster",
+              ["Coussin d'assise, élastique aux pieds :", "le corps trouve sa place."],
+              "Assise dynamique", cy=0.4, graine=14),
+        Photo(4.4, hab, p("salle.jpg"), "Notre espace à Meaux", "Un lieu",
+              ["pensé pour travailler,", "bouger et se poser."], "Accueil adapté", cx=0.6, cy=0.5,
+              graine=15, zoom=(1.0, 1.06)),
+        Cloture(5.8, logo, ["Chaque enfant", "a son potentiel"], 16),
     ]
 
 
 # ---------------------------------------------------------------- audio
-def nappe_sonore(chemin, duree, graine):
-    """Nappe d'ambiance douce générée (aucun droit musical à gérer)."""
+def bande_son(chemin, duree, graine):
+    """Nappe douce + petites notes pincées, générées (aucun droit musical)."""
     sr = 44100
     n = int(duree * sr)
     t = np.arange(n) / sr
-    accords = [[261.63, 329.63, 392.00, 493.88],   # Cmaj7
-               [220.00, 261.63, 329.63, 392.00],   # Am7
-               [174.61, 220.00, 261.63, 329.63],   # Fmaj7
-               [196.00, 246.94, 293.66, 392.00]]   # G
-    if graine == 2:
+    accords = [[261.63, 329.63, 392.00], [220.00, 261.63, 329.63],
+               [174.61, 220.00, 261.63], [196.00, 246.94, 293.66]]
+    if graine % 2 == 0:
         accords = accords[2:] + accords[:2]
-    seg = duree / 4
     out = np.zeros(n)
-    for i, acc in enumerate(accords * 2):
+    seg = duree / 6
+    for i in range(7):
+        acc = accords[i % 4]
         debut = i * seg
+        fin = min(duree, debut + seg + 1.2)
         if debut >= duree:
             break
-        fin = min(duree, debut + seg + 1.5)
         a, b = int(debut * sr), int(fin * sr)
         tt = t[a:b] - debut
-        env = np.minimum(1, tt / 1.2) * np.minimum(1, (fin - debut - tt) / 1.5)
+        env = np.minimum(1, tt / 0.9) * np.minimum(1, (fin - debut - tt) / 1.2)
         for f in acc:
-            for k, g in ((1, 1.0), (2, 0.25), (0.5, 0.35)):
-                out[a:b] += g * np.sin(2 * math.pi * f * k * tt + 0.3 * np.sin(2 * math.pi * 0.2 * tt)) * env
-    # petites notes cristallines
-    rng = np.random.default_rng(graine)
-    for _ in range(int(duree * 0.9)):
-        f = rng.choice([523.25, 659.25, 783.99, 987.77, 1046.5])
-        d0 = rng.uniform(0.5, duree - 2)
-        a = int(d0 * sr)
-        tt = np.arange(int(2 * sr)) / sr
-        out[a:a + len(tt)] += 0.6 * np.sin(2 * math.pi * f * tt) * np.exp(-tt * 3)
-    out *= np.minimum(1, t / 1.5) * np.minimum(1, (duree - t) / 2.0)
-    out = out / np.max(np.abs(out)) * 0.45
-    st = np.stack([out, np.roll(out, 300)], axis=1)
+            out[a:b] += 0.5 * np.sin(2 * math.pi * f * tt) * env
+            out[a:b] += 0.2 * np.sin(2 * math.pi * f / 2 * tt) * env
+        # arpège pincé, 2 notes par temps à ~96 bpm
+        pas = 60 / 96 / 2
+        for j in range(int(seg / pas) + 1):
+            f = acc[j % 3] * (2 if j % 4 < 2 else 4)
+            d0 = debut + j * pas
+            if d0 >= duree - 0.5:
+                break
+            a2 = int(d0 * sr)
+            tn = np.arange(int(0.6 * sr)) / sr
+            note = np.sin(2 * math.pi * f * tn) * np.exp(-tn * 7) * 0.22
+            out[a2:a2 + len(tn)] += note[: max(0, min(len(tn), n - a2))]
+    out *= np.minimum(1, t / 1.0) * np.minimum(1, (duree - t) / 1.8)
+    out = out / np.max(np.abs(out)) * 0.5
+    st = np.stack([out, np.roll(out, 400)], axis=1)
     with wave.open(chemin, "wb") as w:
         w.setnchannels(2)
         w.setsampwidth(2)
@@ -503,14 +548,31 @@ def nappe_sonore(chemin, duree, graine):
 
 
 # ---------------------------------------------------------------- rendu
+def transition(prec, suiv, p):
+    """Volet circulaire rose : un disque couvre l'image puis se retire sur la suivante."""
+    rmax = math.hypot(W, H)
+    if p < 0.5:
+        base, r, centre = prec, ease_in_out(p * 2) * rmax, (0, H)
+    else:
+        base, r, centre = suiv, (1 - ease_in_out((p - 0.5) * 2)) * rmax, (W, 0)
+    base = base.convert("RGBA")
+    c = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(c)
+    cx, cy = centre
+    d.ellipse((cx - r * 1.08, cy - r * 1.08, cx + r * 1.08, cy + r * 1.08), fill=LAVANDE + (255,))
+    d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=ROSE + (255,))
+    base.alpha_composite(c)
+    return base.convert("RGB")
+
+
 def rendre(scenes, sortie, graine):
     debuts, t0 = [], 0.0
     for s in scenes:
         debuts.append(t0)
-        t0 += s.duree - XFADE
-    total = t0 + XFADE
+        t0 += s.duree - TRANSITION
+    total = t0 + TRANSITION
     audio = sortie + ".wav"
-    nappe_sonore(audio, total, graine)
+    bande_son(audio, total, graine)
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24",
            "-s", f"{W}x{H}", "-r", str(FPS), "-i", "-", "-i", audio,
            "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p",
@@ -522,12 +584,13 @@ def rendre(scenes, sortie, graine):
         actives = [(k, t - debuts[k]) for k, s in enumerate(scenes)
                    if debuts[k] <= t < debuts[k] + s.duree]
         k, tl = actives[-1]
-        img = scenes[k].frame(tl)
-        if len(actives) > 1 and tl < XFADE:
+        if len(actives) > 1 and tl < TRANSITION:
             kp, tlp = actives[-2]
-            img = Image.blend(scenes[kp].frame(tlp), img, ease_in_out(tl / XFADE))
+            img = transition(scenes[kp].frame(tlp), scenes[k].frame(tl), tl / TRANSITION)
+        else:
+            img = scenes[k].frame(tl)
         ff.stdin.write(img.tobytes())
-        if i % 60 == 0:
+        if i % 90 == 0:
             print(f"  {i}/{nb}", file=sys.stderr, flush=True)
     ff.stdin.close()
     ff.wait()
@@ -537,9 +600,9 @@ def rendre(scenes, sortie, graine):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("numero", type=int, choices=[1, 2])
+    ap.add_argument("theme", choices=["vocabulaire", "corps"])
     ap.add_argument("--medias", required=True)
     ap.add_argument("--sortie", required=True)
     a = ap.parse_args()
     os.makedirs(os.path.dirname(os.path.abspath(a.sortie)), exist_ok=True)
-    rendre(montage(a.numero, a.medias), a.sortie, a.numero)
+    rendre(montage(a.theme, a.medias), a.sortie, 1 if a.theme == "vocabulaire" else 2)
