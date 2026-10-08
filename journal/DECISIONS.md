@@ -13,3 +13,4 @@ Format : `YYYY-MM-DD · CLIENT · SUJET · DÉCISION OU ACTION`
 2026-10-08 · PESH' Neuro Éveil · légendes IG/FB des 2 Reels (vocabulaire, corps) · à confirmer : lien HelloAsso, volumes hashtags
 2026-10-08 · PESH' Neuro Éveil · vidéo Matinée studieuse (syllabes, lecture, numération) · prénom flouté sur le marque-page ; prénom peut-être lisible sur un bâtonnet de la photo P'tit Sherlock (vidéo 1)
 2026-10-08 · PESH' Neuro Éveil · légendes IG/FB du Reel Matinée studieuse · à confirmer : lien HelloAsso
+2026-10-08 · PESH' Neuro Éveil · Reel Accueil Toussaint (19–23/10, 9h–16h30, 8-14 ans) animé depuis le carrousel 7 visuels · à confirmer : moyen de contact à afficher (téléphone, e-mail ou lien)
