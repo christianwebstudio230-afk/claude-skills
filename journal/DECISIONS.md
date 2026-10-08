@@ -12,3 +12,4 @@ Format : `YYYY-MM-DD · CLIENT · SUJET · DÉCISION OU ACTION`
 2026-10-08 · PESH' Neuro Éveil · vidéo 1 v4 : page Décrire refaite avec photo enfant joyeux (visuel Apaiser les émotions) + bulles annotées · question : photo issue d'une banque d'images ? droits à confirmer
 2026-10-08 · PESH' Neuro Éveil · légendes IG/FB des 2 Reels (vocabulaire, corps) · à confirmer : lien HelloAsso, volumes hashtags
 2026-10-08 · PESH' Neuro Éveil · vidéo Matinée studieuse (syllabes, lecture, numération) · prénom flouté sur le marque-page ; prénom peut-être lisible sur un bâtonnet de la photo P'tit Sherlock (vidéo 1)
+2026-10-08 · PESH' Neuro Éveil · légendes IG/FB du Reel Matinée studieuse · à confirmer : lien HelloAsso
