@@ -451,7 +451,11 @@ class Photo(Scene):
         self.fond = Fond(graine)
         self.sur_titre, self.titre, self.sous_titre = sur_titre, titre, sous_titre
         self.f_sur = font("gras", 32)
-        self.f_titre = font("titre", 100)
+        taille = 100
+        while ImageDraw.Draw(Image.new("RGBA", (1, 1))).textlength(
+                titre.upper(), font=font("titre", taille)) > 760:
+            taille -= 4  # le titre ne doit pas toucher le badge logo
+        self.f_titre = font("titre", taille)
         self.f_sous = font("gras", 40)
         self.cw, self.ch, self.cy0 = 900, ch, 590
         self.photo = cover(charger(chemin), int(self.cw * 1.12), int(self.ch * 1.12), cx, cy)
@@ -743,7 +747,7 @@ def montage(nom, m):
                          sous_titre=("Le nombre avant,", "le nombre après."),
                          etiquette="Fiche numération", cy=0.3, graine=24, zoom=(1.0, 1.04), ch=900),
             Photo(4.4, hab, p("accompagner.jpg"), "Pas à pas", "Accompagner",
-                  ["Une intervenante à côté,", "pour guider sans faire à la place."],
+                  ["Une Technicienne en Remédiation", "Éducative, pour guider", "sans faire à la place."],
                   "Accompagnement", cy=0.45, graine=25),
             Cloture(5.8, hab, ["Apprendre", "à son rythme"], 26),
         ]
