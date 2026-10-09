@@ -17,13 +17,13 @@ import subprocess
 import sys
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 from video_pesh import bande_son, clamp, coeur_plein, coller, ease_back, ease_in_out, ease_out, prog, rect_arrondi
 
 W, H, FPS = 1080, 1920, 30
 TRANSITION = 1.0
-PRISE = (650, 1120)  # position à l'écran du point où les mains se tiennent
+PRISE = (750, 1120)  # position à l'écran du point où les mains se tiennent
 
 MARINE = (20, 27, 69)
 ROSE = (234, 30, 102)
@@ -125,20 +125,40 @@ class Coeurs:
             coller(calque, c["sp"], x, y, alpha=a)
 
 
+DEF = 1.35  # résolution de travail de la photo des mains (marge pour le zoom d'entrée)
+
+
+def detourer(img):
+    """Contour net des mains : masque lissé (sans crénelage), bord adouci, photo accentuée."""
+    k = 2
+    grand = img.resize((img.width * k, img.height * k), Image.LANCZOS)
+    a = np.asarray(grand).astype(np.int16)
+    peau = (a.min(axis=2) < 236).astype(np.uint8) * 255
+    m = Image.fromarray(peau)
+    m = m.filter(ImageFilter.MaxFilter(7)).filter(ImageFilter.MinFilter(7))  # bouche les trous
+    m = m.filter(ImageFilter.MinFilter(11)).filter(ImageFilter.MaxFilter(11))  # retire les miettes
+    m = m.filter(ImageFilter.GaussianBlur(10)).point(lambda v: 255 if v > 128 else 0)  # lisse le contour
+    m = m.filter(ImageFilter.GaussianBlur(1.6))  # bord antialiasé
+    net = grand.filter(ImageFilter.UnsharpMask(radius=2.2, percent=90, threshold=2))
+    fond = Image.new("RGB", grand.size, BLANC)
+    fond.paste(net, (0, 0), m)
+    return fond
+
+
 class Hero:
     duree = 9.6
 
     def __init__(self, m):
         # Pivot de 65° : le bras de l'adulte entre par le bord gauche, celui de l'enfant sort
         # par le bord droit. Les mains forment une bande horizontale adaptée au format vertical.
-        src = Image.open(os.path.join(m, "mains.png")).convert("RGB")
-        ech, angle = 1.12, 65
-        cote = int(src.width * ech)
+        src = detourer(Image.open(os.path.join(m, "mains.png")).convert("RGB"))
+        ech, angle = 1.12 * DEF, 65  # bande préparée en DEF x : jamais agrandie à l'écran
+        cote = int(1254 * ech)
         src = src.resize((cote, cote), Image.LANCZOS)
         self.bande = src.rotate(angle, resample=Image.BICUBIC, expand=True, fillcolor=BLANC)
         dx, dy = 520 * ech - cote / 2, 900 * ech - cote / 2  # point où les mains se tiennent
         ca, sa = math.cos(math.radians(angle)), math.sin(math.radians(angle))
-        marge = 1200  # fond blanc autour, pour pouvoir cadrer sans sortir de l'image
+        marge = int(1200 * DEF)  # fond blanc autour, pour pouvoir cadrer sans sortir de l'image
         fond = Image.new("RGB", (self.bande.width + 2 * marge, self.bande.height + 2 * marge), BLANC)
         fond.paste(self.bande, (marge, marge))
         self.prise = (marge + self.bande.width / 2 + dx * ca + dy * sa,
@@ -170,8 +190,9 @@ class Hero:
         a = ease_out(prog(t, 0.0, 1.4))
         z = 1.25 - 0.25 * a + 0.04 * ease_in_out(t / self.duree)
         px, py = self.prise
-        box = (px - PRISE[0] / z, py - PRISE[1] / z, px + (W - PRISE[0]) / z, py + (H - PRISE[1]) / z)
-        bande = self.bande.resize((W, H), Image.BICUBIC, box=box)
+        k = DEF / z
+        box = (px - PRISE[0] * k, py - PRISE[1] * k, px + (W - PRISE[0]) * k, py + (H - PRISE[1]) * k)
+        bande = self.bande.resize((W, H), Image.LANCZOS, box=box)
         img = Image.blend(img.convert("RGB"), bande, a).convert("RGBA")
 
         c = Image.new("RGBA", (W, H), (0, 0, 0, 0))
