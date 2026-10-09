@@ -16,3 +16,4 @@ Format : `YYYY-MM-DD · CLIENT · SUJET · DÉCISION OU ACTION`
 2026-10-08 · PESH' Neuro Éveil · Reel Accueil Toussaint (19–23/10, 9h–16h30, 8-14 ans) animé depuis le carrousel 7 visuels · à confirmer : moyen de contact à afficher (téléphone, e-mail ou lien)
 2026-10-08 · PESH' Neuro Éveil · Reel Coup de pouce parental animé depuis le visuel carré (texte effacé de la photo, recomposé en animation) · sans date ni horaire : écart 17h45-19h / 18h-19h30 non tranché
 2026-10-09 · PESH' Neuro Éveil · visuel Thématique du mois mis à jour « Observer sans juger » + 4 phrases issues des principes pédagogiques · question : date 13/10 conservée alors que l'agenda place Observer sans juger le 06/10
+2026-10-09 · PESH' Neuro Éveil · horaire officiel Coup de pouce parental confirmé par Kathya : 17h45–19h30 (remplace 17h45–19h00 et 18h–19h30)
