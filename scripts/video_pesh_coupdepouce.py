@@ -23,6 +23,7 @@ from video_pesh import bande_son, clamp, coeur_plein, coller, ease_back, ease_in
 
 W, H, FPS = 1080, 1920, 30
 TRANSITION = 1.0
+PRISE = (650, 1120)  # position à l'écran du point où les mains se tiennent
 
 MARINE = (20, 27, 69)
 ROSE = (234, 30, 102)
@@ -128,9 +129,23 @@ class Hero:
     duree = 9.6
 
     def __init__(self, m):
-        self.mains = Image.open(os.path.join(m, "mains.png")).convert("RGBA").resize((1242, 1242), Image.LANCZOS)
+        # Pivot de 65° : le bras de l'adulte entre par le bord gauche, celui de l'enfant sort
+        # par le bord droit. Les mains forment une bande horizontale adaptée au format vertical.
+        src = Image.open(os.path.join(m, "mains.png")).convert("RGB")
+        ech, angle = 1.12, 65
+        cote = int(src.width * ech)
+        src = src.resize((cote, cote), Image.LANCZOS)
+        self.bande = src.rotate(angle, resample=Image.BICUBIC, expand=True, fillcolor=BLANC)
+        dx, dy = 520 * ech - cote / 2, 900 * ech - cote / 2  # point où les mains se tiennent
+        ca, sa = math.cos(math.radians(angle)), math.sin(math.radians(angle))
+        marge = 1200  # fond blanc autour, pour pouvoir cadrer sans sortir de l'image
+        fond = Image.new("RGB", (self.bande.width + 2 * marge, self.bande.height + 2 * marge), BLANC)
+        fond.paste(self.bande, (marge, marge))
+        self.prise = (marge + self.bande.width / 2 + dx * ca + dy * sa,
+                      marge + self.bande.height / 2 - dx * sa + dy * ca)
+        self.bande = fond
         logo = Image.open(os.path.join(m, "logo_disque.png")).convert("RGBA")
-        logo.thumbnail((190, 190), Image.LANCZOS)
+        logo.thumbnail((300, 300), Image.LANCZOS)
         self.logo = logo
         f = font("chewy", 60)
         self.pilule = rect_arrondi(int(largeur("Les ateliers", f)) + 80, 100, 34, ROSE_PILULE + (255,))
@@ -151,18 +166,13 @@ class Hero:
 
     def frame(self, t):
         img = Image.new("RGBA", (W, H), BLANC + (255,))
-        # la main de l'adulte entre depuis le haut gauche, puis tout respire
+        # les mains arrivent en zoom arrière autour de leur point de rencontre, puis respirent
         a = ease_out(prog(t, 0.0, 1.4))
-        z = 1.08 - 0.08 * a + 0.04 * ease_in_out(t / self.duree)
-        cote = int(self.mains.width * z)
-        mains = self.mains.resize((cote, cote), Image.BICUBIC)
-        dx, dy = -(1 - a) * 160, -(1 - a) * 160
-        if a < 1:
-            mains.putalpha(mains.getchannel("A").point(lambda v: int(v * a)))
-        # le point où les mains se tiennent (≈ 42 % / 75 % du visuel) reste à la même place
-        x = 470 - 0.42 * cote + dx
-        y = 800 + 0.75 * 1242 - 0.75 * cote + dy
-        img.alpha_composite(mains, (int(x), int(y)))
+        z = 1.25 - 0.25 * a + 0.04 * ease_in_out(t / self.duree)
+        px, py = self.prise
+        box = (px - PRISE[0] / z, py - PRISE[1] / z, px + (W - PRISE[0]) / z, py + (H - PRISE[1]) / z)
+        bande = self.bande.resize((W, H), Image.BICUBIC, box=box)
+        img = Image.blend(img.convert("RGB"), bande, a).convert("RGBA")
 
         c = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         b = ease_back(prog(t, 0.5, 0.5))
@@ -175,7 +185,7 @@ class Hero:
         if t > 2.8:
             f = ease_in_out(prog(t, 2.8, 0.9))
             bat = 1 + 0.12 * max(0, math.sin((t - 3.7) * 5)) if t > 3.7 else 1
-            coller(c, coeur_trait(90, f), 860, 1330, echelle=bat)
+            coller(c, coeur_trait(90, f), 560, 1480, echelle=bat)
         img.alpha_composite(c)
 
         self.coeurs.dessiner(img, t)
@@ -184,8 +194,8 @@ class Hero:
             img.alpha_composite(tache(W + 80, H + 80, 640 * g, t, PRUNE))
             p = ease_back(prog(t, 4.0, 0.6))
             coller(img, self.bulle_txt, 840, 1700, echelle=max(p, 0.01), alpha=clamp(p * 2))
-        p = ease_back(prog(t, 0.2, 0.6))
-        coller(img, self.logo, W - 120, 120, echelle=max(p, 0.01), alpha=clamp(p * 2))
+        p = ease_back(prog(t, 4.4, 0.6))
+        coller(img, self.logo, 210, 1650, echelle=max(p, 0.01), alpha=clamp(p * 2))
         return img.convert("RGB")
 
 
