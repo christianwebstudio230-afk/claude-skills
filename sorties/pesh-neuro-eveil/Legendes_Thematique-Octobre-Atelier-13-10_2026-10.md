@@ -2,7 +2,7 @@
 
 Visuel : `Visuel_Thematique-Observer-sans-juger_2026-10.png` (1254 × 1254, carré)
 Atelier Coup de pouce parental · mardi 13 octobre 2026 · 17h45 – 19h30 · 13 rue de l'Arbalète, 77100 Meaux
-Le lien d'inscription est à insérer à la place de `[LIEN D'INSCRIPTION]` (À CONFIRMER).
+Lien d'inscription : https://www.helloasso.com/associations/pesh-neuro-eveil/evenements/coup-de-pouce-parental
 
 ---
 
@@ -53,7 +53,7 @@ L'atelier s'adresse aux parents et aux proches d'un enfant ou d'un adolescent co
 
 🗓 Mardi 13 octobre · 17h45 – 19h30
 📍 13 rue de l'Arbalète, 77100 Meaux
-🔗 Inscription : [LIEN D'INSCRIPTION]
+🔗 Inscription : https://www.helloasso.com/associations/pesh-neuro-eveil/evenements/coup-de-pouce-parental
 
 Chez vous, lequel de ces trois mots revient le plus souvent quand la tension monte ?
 
@@ -81,7 +81,7 @@ Les ateliers Coup de pouce parental reposent sur quelques principes :
 Le programme s'adresse aux parents et aux proches qui accompagnent un enfant ou un adolescent présentant notamment un trouble du neurodéveloppement (TDAH, TSA, troubles dys, dyspraxie) ou des difficultés émotionnelles, exécutives, d'autonomie ou de régulation ayant un retentissement sur le quotidien familial.
 
 Prochain atelier : mardi 13 octobre, de 17h45 à 19h30, au 13 rue de l'Arbalète à Meaux.
-Inscription : [LIEN D'INSCRIPTION]
+Inscription : https://www.helloasso.com/associations/pesh-neuro-eveil/evenements/coup-de-pouce-parental
 
 #Parentalité #TroublesDuNeurodéveloppement #TDAH #Inclusion #Meaux
 
@@ -93,5 +93,5 @@ Inscription : [LIEN D'INSCRIPTION]
 - Vouvoiement, aucune promesse de soin ni de résultat, aucune famille ni aucun enfant nommés.
 - Un seul appel à l'action par légende : l'inscription à l'atelier du 13 octobre.
 - Contenu tiré du programme Coup de pouce parental (principes pédagogiques et public concerné) fourni par Kathya.
-- À CONFIRMER : lien d'inscription (HelloAsso ou autre), gratuité ou tarif de l'atelier, nombre de places si vous voulez l'afficher.
+- À CONFIRMER : gratuité ou tarif de l'atelier, nombre de places si vous voulez l'afficher.
 - Hashtags : volumes non vérifiés, à contrôler dans chaque plateforme avant publication.

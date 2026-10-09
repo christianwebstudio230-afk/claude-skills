@@ -19,3 +19,4 @@ Format : `YYYY-MM-DD · CLIENT · SUJET · DÉCISION OU ACTION`
 2026-10-09 · PESH' Neuro Éveil · horaire officiel Coup de pouce parental confirmé par Kathya : 17h45–19h30 (remplace 17h45–19h00 et 18h–19h30)
 2026-10-09 · PESH' Neuro Éveil · thématique du mois d'octobre = Observer sans juger ; atelier 06/10 Observer sans juger, atelier 13/10 Les mots à proscrire « Toujours, jamais, exprès » · visuel complété avec le sujet de l'atelier du 13
 2026-10-09 · PESH' Neuro Éveil · légendes IG/FB/LinkedIn du visuel thématique d'octobre + atelier 13/10 · à confirmer : lien d'inscription, tarif
+2026-10-09 · PESH' Neuro Éveil · lien HelloAsso Coup de pouce parental ajouté aux légendes de l'atelier du 13/10 : https://www.helloasso.com/associations/pesh-neuro-eveil/evenements/coup-de-pouce-parental
