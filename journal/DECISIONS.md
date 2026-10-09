@@ -21,3 +21,4 @@ Format : `YYYY-MM-DD · CLIENT · SUJET · DÉCISION OU ACTION`
 2026-10-09 · PESH' Neuro Éveil · légendes IG/FB/LinkedIn du visuel thématique d'octobre + atelier 13/10 · à confirmer : lien d'inscription, tarif
 2026-10-09 · PESH' Neuro Éveil · lien HelloAsso Coup de pouce parental ajouté aux légendes de l'atelier du 13/10 : https://www.helloasso.com/associations/pesh-neuro-eveil/evenements/coup-de-pouce-parental
 2026-10-09 · PESH' Neuro Éveil · lien adhésion 2026-2027 ajouté aux légendes des 3 Reels : https://www.helloasso.com/associations/pesh-neuro-eveil/adhesions/adhesion-2026-2027
+2026-10-09 · PESH' Neuro Éveil · déclinaison Instagram 4:5 (1080x1350) du visuel Observer sans juger ; carré conservé pour Facebook et LinkedIn
