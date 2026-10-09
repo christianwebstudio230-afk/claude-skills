@@ -1,7 +1,7 @@
 # Légendes Reel PESH Neuro-Éveil · Matinée studieuse · octobre 2026
 
 Fichier : `Video_Matinee-studieuse_2026-10_v3.mp4` · Instagram type **REEL**
-Le lien HelloAsso est à insérer à la place de `[LIEN HELLOASSO]` (À CONFIRMER).
+Lien d'adhésion : https://www.helloasso.com/associations/pesh-neuro-eveil/adhesions/adhesion-2026-2027
 
 ---
 
@@ -39,7 +39,7 @@ Avant 4, il y a 3. Après 4, il y a 5. Simple ? Pour certains enfants, c'est une
 Ce matin-là, à PESH Neuro-Éveil, on a découpé des mots en syllabes avec des cartes images, lu une enquête de P'tit Sherlock du bout du doigt, et cherché le nombre avant et le nombre après. Une Technicienne en Remédiation Éducative accompagne chaque étape, pour guider sans faire à la place.
 
 📍 13 rue de l'Arbalète, 77100 Meaux
-🔗 Adhésion et inscriptions sur HelloAsso : [LIEN HELLOASSO]
+🔗 Adhésion 2026-2027 sur HelloAsso : https://www.helloasso.com/associations/pesh-neuro-eveil/adhesions/adhesion-2026-2027
 
 Chez vous, quelle astuce aide votre enfant à découper les mots en syllabes ?
 
@@ -53,4 +53,4 @@ Chez vous, quelle astuce aide votre enfant à découper les mots en syllabes ?
 - Vouvoiement, aucune promesse de soin ni de résultat, aucun enfant nommé (prénom flouté sur le marque-page).
 - Un seul appel à l'action par légende (adhésion et inscriptions).
 - Hashtags : volumes non vérifiés, à contrôler dans Instagram avant publication. Tags de niche différents des deux Reels précédents.
-- À CONFIRMER : lien HelloAsso, accord écrit des parents et de l'intervenante pour l'image.
+- À CONFIRMER : accord écrit des parents et de l'intervenante pour l'image.

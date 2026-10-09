@@ -20,3 +20,4 @@ Format : `YYYY-MM-DD · CLIENT · SUJET · DÉCISION OU ACTION`
 2026-10-09 · PESH' Neuro Éveil · thématique du mois d'octobre = Observer sans juger ; atelier 06/10 Observer sans juger, atelier 13/10 Les mots à proscrire « Toujours, jamais, exprès » · visuel complété avec le sujet de l'atelier du 13
 2026-10-09 · PESH' Neuro Éveil · légendes IG/FB/LinkedIn du visuel thématique d'octobre + atelier 13/10 · à confirmer : lien d'inscription, tarif
 2026-10-09 · PESH' Neuro Éveil · lien HelloAsso Coup de pouce parental ajouté aux légendes de l'atelier du 13/10 : https://www.helloasso.com/associations/pesh-neuro-eveil/evenements/coup-de-pouce-parental
+2026-10-09 · PESH' Neuro Éveil · lien adhésion 2026-2027 ajouté aux légendes des 3 Reels : https://www.helloasso.com/associations/pesh-neuro-eveil/adhesions/adhesion-2026-2027

@@ -1,7 +1,7 @@
 # Légendes Reels PESH Neuro-Éveil · octobre 2026
 
 Deux vidéos, deux plateformes. Texte prêt à coller.
-Le lien HelloAsso est à insérer à la place de `[LIEN HELLOASSO]` (À CONFIRMER).
+Lien d'adhésion : https://www.helloasso.com/associations/pesh-neuro-eveil/adhesions/adhesion-2026-2027
 
 ---
 
@@ -44,7 +44,7 @@ Au local de PESH Neuro-Éveil, à Meaux, on apprend le vocabulaire… en jouant 
 Observer, poser une question, nommer un détail, puis faire une phrase complète : pour certains enfants, chaque étape demande du temps. Nos intervenantes les accompagnent pas à pas, avec des jeux, des livres d'enquête et du matériel adapté.
 
 📍 13 rue de l'Arbalète, 77100 Meaux
-🔗 Adhésion et inscriptions sur HelloAsso : [LIEN HELLOASSO]
+🔗 Adhésion 2026-2027 sur HelloAsso : https://www.helloasso.com/associations/pesh-neuro-eveil/adhesions/adhesion-2026-2027
 
 Chez vous, quel jeu aide votre enfant à trouver ses mots ?
 
@@ -88,7 +88,7 @@ Droite, gauche, devant, derrière : des mots simples, qui ne vont pas de soi pou
 À PESH Neuro-Éveil, on les apprend avec le corps entier. Une partie de Twister pour se repérer, des mots posés sur chaque geste, et une assise qui laisse le corps bouger un peu, avec un coussin et un élastique aux pieds de la chaise.
 
 📍 13 rue de l'Arbalète, 77100 Meaux
-🔗 Adhésion et inscriptions sur HelloAsso : [LIEN HELLOASSO]
+🔗 Adhésion 2026-2027 sur HelloAsso : https://www.helloasso.com/associations/pesh-neuro-eveil/adhesions/adhesion-2026-2027
 
 Chez vous, qu'est-ce qui aide votre enfant à rester disponible quand il doit rester assis longtemps ?
 
@@ -102,4 +102,4 @@ Chez vous, qu'est-ce qui aide votre enfant à rester disponible quand il doit re
 - Vouvoiement, aucune promesse de soin ni de résultat, aucun enfant nommé.
 - Un seul appel à l'action par légende (adhésion et inscriptions).
 - Hashtags : volumes non vérifiés, à contrôler dans Instagram avant publication pour respecter le mix large / moyen / niche.
-- À CONFIRMER : lien HelloAsso, accord écrit des parents pour l'image des enfants, droits sur la photo de l'enfant souriant (vidéo 1).
+- À CONFIRMER : accord écrit des parents pour l'image des enfants, droits sur la photo de l'enfant souriant (vidéo 1).
